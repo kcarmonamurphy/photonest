@@ -1,4 +1,4 @@
-"""collexif URL Configuration
+"""photonest URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.10/topics/http/urls/
@@ -22,4 +22,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     
     url(r'^$', views.index, name='index'),
+
+    url(r'^view-image/$', views.viewImage, name='view-Image'),
 ]
