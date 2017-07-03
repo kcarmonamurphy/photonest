@@ -23,5 +23,5 @@ urlpatterns = [
     
     url(r'^$', views.index, name='index'),
 
-    url(r'^view-image/$', views.viewImage, name='view-Image'),
+    url(r'^(?P<filename>.*)/metadata$', views.metadata, name='metadata'),
 ]
