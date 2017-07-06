@@ -20,5 +20,14 @@ services:
       - "4567:4567"
     depends_on:
       - db
+  notebook:
+    build: .
+    command: python manage.py shell_plus --notebook
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
 volumes:
   db_data:
