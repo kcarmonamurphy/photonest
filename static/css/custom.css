@@ -1,0 +1,22 @@
+.photoswipe-container {
+	position: relative;
+	height:400px;
+}
+
+footer {
+	padding:10px;
+}
+
+footer .row, main .row {
+	margin: 0;
+}
+
+main > .row > .col {
+	padding:0;
+}
+
+main > .row,
+main > .row > .col,
+main > .row > .col > .photoswipe-container {
+	height: 100%;
+}

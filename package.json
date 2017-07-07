@@ -4,7 +4,8 @@
   "description": "Databaseless photo manager",
   "main": "manage.py",
   "dependencies": {
-    "materialize-css": "^0.99.0"
+    "materialize-css": "^0.99.0",
+    "photoswipe": "^4.1.2"
   },
   "devDependencies": {},
   "scripts": {
