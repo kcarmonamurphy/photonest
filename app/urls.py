@@ -20,8 +20,10 @@ from . import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    
-    url(r'^$', views.index, name='index'),
 
-    url(r'^(?P<filename>.*)/metadata$', views.metadata, name='metadata'),
+    url(r'^gallery/(?P<path>.*)/raw$', views.raw, name='raw'),
+
+    url(r'^gallery/(?P<path>.*)/metadata$', views.metadata, name='metadata'),
+
+    url(r'^gallery/(?P<path>.*)$', views.path, name='path'),
 ]

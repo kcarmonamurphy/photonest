@@ -2,5 +2,5 @@ collection/*
 .env
 *.ipynb
 .ipynb_checkpoints/*
-photo_library/*
+gallery/*
 node_modules/*

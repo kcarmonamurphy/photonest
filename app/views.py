@@ -7,31 +7,64 @@ import os
 
 from modules.metadata import MetaData
 
-def index(request):
+def folder(request, path):
 
-    return HttpResponse("Hello, world. You're at the polls index.")
+    file_paths = []
+    dir_paths = []
+    for _, dirs, files in os.walk(path):
+        for name in files:
+            file_paths.append(name)
+        for name in dirs:
+            dir_paths.append(name)
 
-def folder(request):
+    context = {
+        'folder_path': path,
+        'dir_paths': dir_paths,
+        'file_paths': file_paths
+    }
     
-    return HttpResponse("view image");
+    return render(request, 'main.html', context)
 
-def photo(request):
-    
-    return HttpResponse("view image");
+def photo(request, path):
+ 
+    context = {'filename': path }
 
-def metadata(request, filename):
+    return render(request, 'main.html', context)
 
-    # try:
-    filepath = os.path.join(settings.PHOTO_LIBRARY_DIR, filename)
-    # file = open(filepath, 'r')
+def raw(request, path):
 
-    md = MetaData(filepath)
-    hello = md.getImageSize()
-    
-    context = {'filename': filename, 'output': hello}
-    # except:
-    #     raise Http404("File not found")
+    full_path = os.path.join(settings.GALLERY_DIR, path)
+
+    try:
+        with open(full_path, "rb") as file:
+            return HttpResponse(file.read(), content_type="image/jpeg")
+    except IOError:
+        red = Image.new('RGBA', (1, 1), (255,0,0,0))
+        response = HttpResponse(content_type="image/jpeg")
+        red.save(response, "JPEG")
+        return response
+
+def metadata(path):
+
+    md = MetaData(path)
+
+    return {
+        "image_size": md.getImageSize()
+    }
 
 
-    return render(request, 'metadata.html', context)
+def path(request, path):
+
+    try:
+        full_path = os.path.join(settings.GALLERY_DIR, path)
+    except:
+        raise Exception('bad path')
+
+    if os.path.isdir(full_path):
+        return folder(request, full_path)
+
+    if os.path.isfile(full_path):
+        return photo(request, full_path)
+
+    raise Http404("Haven't found shit")
 

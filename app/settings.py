@@ -4,7 +4,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Path for Photo Library
-PHOTO_LIBRARY_DIR = os.path.join(BASE_DIR, "photo_library")
+GALLERY_DIR = os.path.join(BASE_DIR, "gallery")
 
 
 # Quick-start development settings - unsuitable for production
