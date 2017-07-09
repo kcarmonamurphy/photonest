@@ -4,6 +4,7 @@ from django.shortcuts import render
 
 from django.conf import settings
 import os
+import magic
 
 from modules.metadata import MetaData
 
@@ -11,9 +12,18 @@ def folder(request, path):
 
     file_paths = []
     dir_paths = []
+
     for _, dirs, files in os.walk(path):
+
         for name in files:
-            file_paths.append(name)
+            mime_type = magic.from_file(
+                os.path.join(path, name), 
+                mime=True
+            )
+            mime_category = mime_type.split('/')
+            if mime_category[0] == 'image':
+                file_paths.append(name)
+                
         for name in dirs:
             dir_paths.append(name)
 

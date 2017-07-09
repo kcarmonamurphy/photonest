@@ -3,3 +3,4 @@ mysqlclient
 django-dotenv
 django-extensions
 jupyter
+python-magic

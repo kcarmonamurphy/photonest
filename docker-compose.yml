@@ -13,20 +13,12 @@ services:
     restart: always
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:4567
-    volumes:
-      - .:/app
-    ports:
-      - "4567:4567"
-    depends_on:
-      - db
-  notebook:
-    build: .
-    command: python manage.py shell_plus --notebook
+    command: /usr/bin/supervisord -c supervisord.conf
     volumes:
       - .:/app
     ports:
       - "8080:8080"
+      - "4567:4567"
     depends_on:
       - db
 volumes:

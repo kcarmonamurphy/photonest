@@ -17,6 +17,8 @@ RUN cd /tmp \
 	&& cd .. \
 	&& rm -rf Image-ExifTool-${EXIFTOOL_VERSION}
 
+RUN apt-get install supervisor -y
+
 RUN mkdir /app
 
 WORKDIR /app
