@@ -1,4 +1,6 @@
 $(document).ready(function() {
+
+	var pswp;
 	
 
 	$(".button-collapse").sideNav();
@@ -11,6 +13,22 @@ $(document).ready(function() {
 
 
 
+	$(".gallery-image").click(function() {
+		$("#gallery").hide();
+		pswp = initPhotoSwipe();
+		pswp.init();
+
+		pswp.listen('close', function() { 
+			$("#gallery").show();
+		});
+	});
+
+
+
+
+});
+
+function initPhotoSwipe() {
 
 	var pswpElement = document.querySelectorAll('.pswp')[0];
 
@@ -40,7 +58,5 @@ $(document).ready(function() {
 	};
 
 	// Initializes and opens PhotoSwipe
-	var gallery = new PhotoSwipe( pswpElement, PhotoSwipeUI_Default, items, options);
-	gallery.init();
-
-})
+	return new PhotoSwipe( pswpElement, PhotoSwipeUI_Default, items, options);
+}

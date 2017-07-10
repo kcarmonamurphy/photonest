@@ -4,6 +4,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Path for Photo Library
+GALLERY_PREFIX = "gallery"
 GALLERY_DIR = os.path.join(BASE_DIR, "gallery")
 
 

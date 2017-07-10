@@ -7,30 +7,35 @@ import os
 import magic
 
 from modules.metadata import MetaData
+from modules.path_helper import *
 
-def folder(request, path):
+def folder(request, abs_path):
 
-    file_paths = []
-    dir_paths = []
+    file_entries = []
+    dir_entries = []
 
-    for _, dirs, files in os.walk(path):
+    for entry in os.scandir(abs_path):
 
-        for name in files:
-            mime_type = magic.from_file(
-                os.path.join(path, name), 
-                mime=True
-            )
+        if not entry.name.startswith('.') and entry.is_dir():
+            dir_entries.append({
+                'uri': getGalleryURI(entry.path),
+                'name': entry.name
+            })
+
+        if not entry.name.startswith('.') and entry.is_file():
+            mime_type = magic.from_file(entry.path, mime=True)
             mime_category = mime_type.split('/')
             if mime_category[0] == 'image':
-                file_paths.append(name)
-                
-        for name in dirs:
-            dir_paths.append(name)
+                file_entries.append({
+                    'uri': getGalleryURI(entry.path),
+                    'name': entry.name
+                })
+            
 
     context = {
         'folder_path': path,
-        'dir_paths': dir_paths,
-        'file_paths': file_paths
+        'file_entries': file_entries,
+        'dir_entries': dir_entries
     }
     
     return render(request, 'main.html', context)
@@ -65,16 +70,21 @@ def metadata(path):
 
 def path(request, path):
 
+    if request.GET.get('raw'):
+        return raw(request, path)
+    if request.GET.get('metadata'):
+        return metadata(path)
+
     try:
-        full_path = os.path.join(settings.GALLERY_DIR, path)
+        abs_path = os.path.join(settings.GALLERY_DIR, path)
     except:
         raise Exception('bad path')
 
-    if os.path.isdir(full_path):
-        return folder(request, full_path)
+    if os.path.isdir(abs_path):
+        return folder(request, abs_path)
 
-    if os.path.isfile(full_path):
-        return photo(request, full_path)
+    if os.path.isfile(abs_path):
+        return photo(request, abs_path)
 
     raise Http404("Haven't found shit")
 

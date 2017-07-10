@@ -1,3 +1,24 @@
-{% for path in file_paths %}
-	<img src="{{path}}/raw" width="300" />
+{% load staticfiles %}
+
+{% for entry in file_entries %}
+<figure class="gallery-image" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+    <a href="{{entry.uri}}?raw=1" itemprop="contentUrl">
+        <img src="{{entry.uri}}?raw=1" itemprop="thumbnail" alt="Image description" />
+    </a>
+
+    <!-- optionally use this method to store image dimensions for PhotoSwipe -->
+    <meta itemprop="width" content="300">
+    <meta itemprop="height" content="600">
+
+    <figcaption itemprop="caption description">
+        Long image description
+    </figcaption>
+</figure>
 {% endfor %}
+
+{% for entry in dir_entries %}
+	<a class="gallery-folder" href="{{entry.uri}}">
+		<img src="{% static 'images/folder.png' %}" alt="{{entry.name}}" width="300" />
+	</a>
+{% endfor %}
+

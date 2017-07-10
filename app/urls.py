@@ -15,15 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.conf import settings
 
 from . import views
+import re
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
-    url(r'^gallery/(?P<path>.*)/raw$', views.raw, name='raw'),
-
-    url(r'^gallery/(?P<path>.*)/metadata$', views.metadata, name='metadata'),
-
-    url(r'^gallery/(?P<path>.*)$', views.path, name='path'),
+    url(r'^' + re.escape(settings.GALLERY_PREFIX) + '/(?P<path>.*)$', views.path, name='path'),
 ]

@@ -3,15 +3,15 @@ from subprocess import check_output
 
 class MetaData():
 
-    def __init__(self, filepath): # this method creates the class object.
-        self.filepath = filepath
+    def __init__(self, file_path): # this method creates the class object.
+        self.file_path = file_path
 
     def _getMetaData(self, key=None):
 
-        try:
-            output = check_output(["exiftool", "-json", self.filepath])
-        except:
-            pass
+        # try:
+        output = check_output(["exiftool", "-json", self.file_path])
+        # except:
+        #     pass
 
         metadataDict = json.loads(output)[0]
 
@@ -25,7 +25,7 @@ class MetaData():
         arg = "-" + key + "=" + value
 
         try:
-            output = check_output(["exiftool", arg, self.filepath])
+            output = check_output(["exiftool", arg, self.file_path])
         except:
             return False
 
