@@ -5,21 +5,21 @@ $(document).ready(function() {
 
 	$(".button-collapse").sideNav();
 
-	$('main').height(
-		$(document).height() - 
-		$('header').outerHeight() - 
-		$('footer').outerHeight()
-	);
+	// $('main').height(
+	// 	$(document).height() - 
+	// 	$('header').outerHeight() - 
+	// 	$('footer').outerHeight()
+	// );
 
 
 
 	$(".gallery-image").click(function() {
-		$("#gallery").hide();
+		$("#photoswipe-container").show();
 		pswp = initPhotoSwipe();
 		pswp.init();
 
 		pswp.listen('close', function() { 
-			$("#gallery").show();
+			$("#photoswipe-container").hide();
 		});
 	});
 
