@@ -13,6 +13,9 @@ def folder(request, abs_path):
 
     file_entries = []
     dir_entries = []
+    index = 0
+
+    md = MetaData(abs_path)
 
     for entry in os.scandir(abs_path):
 
@@ -28,8 +31,11 @@ def folder(request, abs_path):
             if mime_category[0] == 'image':
                 file_entries.append({
                     'uri': getGalleryURI(entry.path),
-                    'name': entry.name
+                    'name': entry.name,
+                    'index': index,
+                    'size': md.getImageSize()
                 })
+                index+=1
             
 
     context = {
@@ -54,10 +60,7 @@ def raw(request, path):
         with open(full_path, "rb") as file:
             return HttpResponse(file.read(), content_type="image/jpeg")
     except IOError:
-        red = Image.new('RGBA', (1, 1), (255,0,0,0))
-        response = HttpResponse(content_type="image/jpeg")
-        red.save(response, "JPEG")
-        return response
+        raise Exception("issue opening image")
 
 def metadata(path):
 

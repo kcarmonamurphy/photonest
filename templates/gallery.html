@@ -1,24 +1,30 @@
 {% load staticfiles %}
 
-{% for entry in file_entries %}
-<figure class="gallery-image" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
-    <a href="#" itemprop="contentUrl">
-        <img src="{{entry.uri}}?raw=1" itemprop="thumbnail" alt="Image description" />
-    </a>
+<div class="flex-container">
 
-    <!-- optionally use this method to store image dimensions for PhotoSwipe -->
-    <meta itemprop="width" content="300">
-    <meta itemprop="height" content="600">
+	{% for entry in file_entries %}
+	<figure class="gallery-image" id="{{entry.index}}"" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+	    <a href="{{entry.uri}}?raw=1" itemprop="contentUrl" data-size="{{entry.size}}">
+	        <img src="{{entry.uri}}?raw=1" itemprop="thumbnail" alt="{{entry.name}}" />
+	    </a>
 
-    <figcaption itemprop="caption description">
-        Long image description
-    </figcaption>
-</figure>
-{% endfor %}
+	    <figcaption itemprop="caption description">
+	        {{entry.name}}
+	    </figcaption>
+	</figure>
+	{% endfor %}
 
-{% for entry in dir_entries %}
-	<a class="gallery-folder" href="{{entry.uri}}">
-		<img src="{% static 'images/folder.png' %}" alt="{{entry.name}}" width="300" />
-	</a>
-{% endfor %}
+	{% for entry in dir_entries %}
+	<figure class="gallery-folder" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+	    <a href="{{entry.uri}}" itemprop="contentUrl" data-size="{{entry.size}}">
+	        <img src="{% static 'images/folder.png' %}" itemprop="thumbnail" alt="{{entry.name}}" />
+	    </a>
+
+	    <figcaption itemprop="caption description">
+	        {{entry.name}}
+	    </figcaption>
+	</figure>
+	{% endfor %}
+
+</div>
 
