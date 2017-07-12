@@ -15,8 +15,6 @@ def folder(request, abs_path):
     dir_entries = []
     index = 0
 
-    md = MetaData(abs_path)
-
     for entry in os.scandir(abs_path):
 
         if not entry.name.startswith('.') and entry.is_dir():
@@ -26,6 +24,7 @@ def folder(request, abs_path):
             })
 
         if not entry.name.startswith('.') and entry.is_file():
+            md = MetaData(entry.path)
             mime_type = magic.from_file(entry.path, mime=True)
             mime_category = mime_type.split('/')
             if mime_category[0] == 'image':
