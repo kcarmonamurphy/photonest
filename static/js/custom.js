@@ -14,9 +14,10 @@ $(document).ready(function() {
 
 	$(".gallery-image > a").click(function(e) {
 		e.preventDefault();
-	})
+	});
 
 });
+
 
 function getPhotoSwipeItems() {
 	var images = $(".gallery-image");
