@@ -4,13 +4,16 @@
 
 	{% for entry in file_entries %}
 	<figure class="gallery-image" id="{{entry.index}}"" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
-	    <a href="{{entry.uri}}?raw=1" itemprop="contentUrl" data-size="{{entry.size}}">
-	        <img src="{{entry.uri}}?raw=1" itemprop="thumbnail" alt="{{entry.name}}" />
-	    </a>
 
-	    <figcaption itemprop="caption description">
-	        {{entry.name}}
-	    </figcaption>
+		<div class="selection-boundary">
+		    <a href="{{entry.uri}}?raw=1" itemprop="contentUrl" data-size="{{entry.size}}">
+		        <img src="{{entry.uri}}?raw=1" itemprop="thumbnail" alt="{{entry.name}}" />
+		    </a>
+
+		    <figcaption itemprop="caption description">
+		        {{entry.name}}
+		    </figcaption>
+		</div>
 	</figure>
 	{% endfor %}
 

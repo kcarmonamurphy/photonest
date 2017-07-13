@@ -64,16 +64,13 @@ main {
 		border: 1px solid @light-blue;
 	}
 
+	figcaption {
+		word-break: break-all;
+	}
 
-	// @media screen and (max-width: 992px) {
-	// 	flex-basis: 25%;
-	// 	background-color: red;
-	// }
-
-	// @media screen and (max-width: 640px) {
-	// 	flex-basis: 50%;
-	// 	background-color: green;
-	// }
+	&.active .selection-boundary{
+		background-color:#456;
+	}
 }
 
 .flex-one {
@@ -83,6 +80,10 @@ main {
 	.gallery-image {
 		flex-basis:100%;
 		padding: 4%;
+	}
+
+	.selection-boundary {
+		padding:3%;
 	}
 		
 }
@@ -95,6 +96,10 @@ main {
 		flex-basis:50%;
 		padding: 3%;
 	}
+
+	.selection-boundary {
+		padding:4%;
+	}
 }
 
 .flex-three {
@@ -104,6 +109,10 @@ main {
 	.gallery-image {
 		flex-basis:33.33%;
 		padding: 2.4%;
+	}
+
+	.selection-boundary {
+		padding:5%;
 	}
 }
 
@@ -115,6 +124,10 @@ main {
 		flex-basis:25%;
 		padding: 2.2%;
 	}
+
+	.selection-boundary {
+		padding:6%;
+	}
 }
 
 .flex-five {
@@ -124,6 +137,10 @@ main {
 	.gallery-image {
 		flex-basis:20%;
 		padding: 2%;
+	}
+
+	.selection-boundary {
+		padding:6%;
 	}
 }
 
@@ -135,6 +152,10 @@ main {
 		flex-basis: 16.6666%;
 		padding: 1.8%;
 	}
+
+	.selection-boundary {
+		padding:8%;
+	}
 }
 
 .flex-eight {
@@ -145,6 +166,10 @@ main {
 		flex-basis: 12.5%;
 		padding: 1.6%;
 	}
+
+	.selection-boundary {
+		padding:9%;
+	}
 }
 
 .flex-ten {
@@ -154,6 +179,10 @@ main {
 	.gallery-image {
 		flex-basis: 10%;
 		padding: 1.5%;
+	}
+
+	.selection-boundary {
+		padding:10%;
 	}
 }
 
