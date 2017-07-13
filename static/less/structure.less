@@ -55,13 +55,12 @@ main {
 	justify-content: flex-start;
 }
 
-.gallery-image {
+.gallery-image, .gallery-folder {
 
 	margin: 0;
 
 	img {
 		width: 100%;
-		border: 1px solid @light-blue;
 	}
 
 	figcaption {
@@ -73,11 +72,15 @@ main {
 	}
 }
 
-.flex-one {
+.gallery-image img {
+	border: 1px solid @light-blue;
+}
+
+.flex-1 {
 
 	padding: 4%;
 
-	.gallery-image {
+	.gallery-image, .gallery-folder {
 		flex-basis:100%;
 		padding: 4%;
 	}
@@ -88,11 +91,11 @@ main {
 		
 }
 
-.flex-two {
+.flex-2 {
 
 	padding: 3%;
 
-	.gallery-image {
+	.gallery-image, .gallery-folder {
 		flex-basis:50%;
 		padding: 3%;
 	}
@@ -102,11 +105,11 @@ main {
 	}
 }
 
-.flex-three {
+.flex-3 {
 
 	padding: 2.4%;
 
-	.gallery-image {
+	.gallery-image, .gallery-folder {
 		flex-basis:33.33%;
 		padding: 2.4%;
 	}
@@ -116,11 +119,11 @@ main {
 	}
 }
 
-.flex-four {
+.flex-4 {
 
 	padding: 2.2%;
 
-	.gallery-image {
+	.gallery-image, .gallery-folder {
 		flex-basis:25%;
 		padding: 2.2%;
 	}
@@ -130,11 +133,11 @@ main {
 	}
 }
 
-.flex-five {
+.flex-5 {
 
 	padding: 2%;
 
-	.gallery-image {
+	.gallery-image, .gallery-folder {
 		flex-basis:20%;
 		padding: 2%;
 	}
@@ -144,11 +147,11 @@ main {
 	}
 }
 
-.flex-six {
+.flex-6 {
 
 	padding: 1.8%;
 
-	.gallery-image {
+	.gallery-image, .gallery-folder {
 		flex-basis: 16.6666%;
 		padding: 1.8%;
 	}
@@ -158,11 +161,11 @@ main {
 	}
 }
 
-.flex-eight {
+.flex-8 {
 
 	padding: 1.6%;
 
-	.gallery-image {
+	.gallery-image, .gallery-folder {
 		flex-basis: 12.5%;
 		padding: 1.6%;
 	}
@@ -172,11 +175,11 @@ main {
 	}
 }
 
-.flex-ten {
+.flex-10 {
 
 	padding: 1.5%;
 
-	.gallery-image {
+	.gallery-image, .gallery-folder {
 		flex-basis: 10%;
 		padding: 1.5%;
 	}
@@ -185,15 +188,6 @@ main {
 		padding:10%;
 	}
 }
-
-.gallery-folder {
-	display: inline-block;
-
-	img {
-		width:150px;
-	}
-}
-
 
 
 

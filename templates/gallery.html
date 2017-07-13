@@ -1,6 +1,6 @@
 {% load staticfiles %}
 
-<div id="flex-container" class="flex-four">
+<div id="flex-container" class="flex-4">
 
 	{% for entry in file_entries %}
 	<figure class="gallery-image" id="{{entry.index}}"" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
@@ -19,13 +19,15 @@
 
 	{% for entry in dir_entries %}
 	<figure class="gallery-folder" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
-	    <a href="{{entry.uri}}" itemprop="contentUrl" data-size="{{entry.size}}">
-	        <img src="{% static 'images/folder.png' %}" itemprop="thumbnail" alt="{{entry.name}}" />
-	    </a>
+		<div class="selection-boundary">
+		    <a href="{{entry.uri}}" itemprop="contentUrl" data-size="{{entry.size}}">
+		        <img src="{% static 'images/folder.png' %}" itemprop="thumbnail" alt="{{entry.name}}" />
+		    </a>
 
-	    <figcaption itemprop="caption description">
-	        {{entry.name}}
-	    </figcaption>
+		    <figcaption itemprop="caption description">
+		        {{entry.name}}
+		    </figcaption>
+		</div>
 	</figure>
 	{% endfor %}
 

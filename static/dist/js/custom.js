@@ -2,17 +2,21 @@ $(document).ready(function() {
 
 	flexListener = galleryKeyboardShortcuts();
 
-	$(".gallery-image").first().addClass("active");
+	$(".gallery-image, .gallery-folder").first().addClass("active");
 
-	$(".gallery-image a").click(function(e) {
+	$(".gallery-image a, .gallery-folder a").click(function(e) {
 		e.preventDefault();
 
-		$(".gallery-image").removeClass("active");
-		$(this).parents(".gallery-image").addClass("active");
+		$(".gallery-image, .gallery-folder").removeClass("active");
+		$(this).parents(".gallery-image, .gallery-folder").addClass("active");
 	});
 
 	$(".gallery-image").dblclick(function() {
 		launchPhotoSwipe(this);
+	});
+
+	$(".gallery-folder").dblclick(function() {
+		window.location = $(this).find('a').attr("href");
 	});
 
 
@@ -41,6 +45,11 @@ function launchPhotoSwipe(galleryImage) {
 
 	pswp.listen('close', function() { 
 		$("#photoswipe-container").fadeOut(500);
+	});
+
+	pswp.listen('afterChange', function() {
+		$(".gallery-image").removeClass("active");
+		$(".gallery-image#" + pswp.currItem.el.id).addClass("active");
 	});
 	
 	photoSwipeKeyboardShortcuts(flexListener, pswp);
