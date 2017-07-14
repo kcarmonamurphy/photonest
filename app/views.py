@@ -20,8 +20,10 @@ def folder(request, abs_path):
         if not entry.name.startswith('.') and entry.is_dir():
             dir_entries.append({
                 'uri': getGalleryURI(entry.path),
-                'name': entry.name
+                'name': entry.name,
+                'index': index
             })
+            index+=1
 
         if not entry.name.startswith('.') and entry.is_file():
             md = MetaData(entry.path)
@@ -32,7 +34,12 @@ def folder(request, abs_path):
                     'uri': getGalleryURI(entry.path),
                     'name': entry.name,
                     'index': index,
-                    'size': md.getImageSize()
+                    'size': md.getImageSize(),
+                    'metadata': {
+                        'image_size': md.getImageSize(),
+                        'file_size': md.getFileSize(),
+                        'file_type': md.getFileType()
+                    }
                 })
                 index+=1
             
@@ -61,13 +68,21 @@ def raw(request, path):
     except IOError:
         raise Exception("issue opening image")
 
-def metadata(path):
+def metadata(request, path):
 
-    md = MetaData(path)
+    full_path = os.path.join(settings.GALLERY_DIR, path)
 
-    return {
-        "image_size": md.getImageSize()
+    md = MetaData(full_path)
+
+    context = {
+        'read_only_properties': {
+            'image_size': str(md.getImageSize()),
+            'file_size': str(md.getFileSize()),
+            'file_type': str(md.getFileType())
+        }
     }
+
+    return render(request, 'metadata.html', context)
 
 
 def path(request, path):
@@ -75,7 +90,7 @@ def path(request, path):
     if request.GET.get('raw'):
         return raw(request, path)
     if request.GET.get('metadata'):
-        return metadata(path)
+        return metadata(request, path)
 
     try:
         abs_path = os.path.join(settings.GALLERY_DIR, path)

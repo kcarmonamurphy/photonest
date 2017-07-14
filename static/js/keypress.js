@@ -46,45 +46,54 @@ function galleryKeyboardShortcuts() {
 }
 
 function selectThumbnailUp() {
-	activeThumbnail = $(".gallery-image.active, .gallery-folder.active");
+	$activeThumbnail = $(".gallery-image.active, .gallery-folder.active");
 	flexClass = $("#flex-container").attr("class");
 	itemsPerRow = flexClass.split("-")[1];
-	upThumbnail = activeThumbnail.prevAll().eq(itemsPerRow-1);
-	if (upThumbnail.length) {
-		upThumbnail.addClass("active");
-		activeThumbnail.removeClass("active");
-		scrollIntoViewIfNeeded(upThumbnail);
+	$upThumbnail = $activeThumbnail.prevAll().eq(itemsPerRow-1);
+	if ($upThumbnail.length) {
+		$upThumbnail.addClass("active");
+		$activeThumbnail.removeClass("active");
+		scrollIntoViewIfNeeded($upThumbnail);
+		
+		updateMetadataSidebar($upThumbnail);
 	}
 }
 
 function selectThumbnailDown() {
-	activeThumbnail = $(".gallery-image.active, .gallery-folder.active");
+	$activeThumbnail = $(".gallery-image.active, .gallery-folder.active");
 	flexClass = $("#flex-container").attr("class");
 	itemsPerRow = flexClass.split("-")[1];
-	downThumbnail = activeThumbnail.nextAll().eq(itemsPerRow-1)
-	if (downThumbnail.length) {
-		downThumbnail.addClass("active");
-		activeThumbnail.removeClass("active");
-		scrollIntoViewIfNeeded(downThumbnail);
+	$downThumbnail = $activeThumbnail.nextAll().eq(itemsPerRow-1)
+	if ($downThumbnail.length) {
+		$downThumbnail.addClass("active");
+		$activeThumbnail.removeClass("active");
+		scrollIntoViewIfNeeded($downThumbnail);
+
+		updateMetadataSidebar($downThumbnail);
 	}
 }
 
 function selectThumbnailLeft() {
-	activeThumbnail = $(".gallery-image.active, .gallery-folder.active");	leftThumbnail = activeThumbnail.prev();
-	if (leftThumbnail.length) {
-		leftThumbnail.addClass("active");
-		activeThumbnail.removeClass("active");
-		scrollIntoViewIfNeeded(leftThumbnail);
+	$activeThumbnail = $(".gallery-image.active, .gallery-folder.active");
+	$leftThumbnail = $activeThumbnail.prev();
+	if ($leftThumbnail.length) {
+		$leftThumbnail.addClass("active");
+		$activeThumbnail.removeClass("active");
+		scrollIntoViewIfNeeded($leftThumbnail);
+
+		updateMetadataSidebar($leftThumbnail);
 	}
 }
 
 function selectThumbnailRight() {
-	activeThumbnail = $(".gallery-image.active, .gallery-folder.active");
-	rightThumbnail = activeThumbnail.next();
-	if (rightThumbnail.length) {
-		rightThumbnail.addClass("active");
-		activeThumbnail.removeClass("active");
-		scrollIntoViewIfNeeded(rightThumbnail);
+	$activeThumbnail = $(".gallery-image.active, .gallery-folder.active");
+	$rightThumbnail = $activeThumbnail.next();
+	if ($rightThumbnail.length) {
+		$rightThumbnail.addClass("active");
+		$activeThumbnail.removeClass("active");
+		scrollIntoViewIfNeeded($rightThumbnail);
+
+		updateMetadataSidebar($rightThumbnail);
 	}
 }
 

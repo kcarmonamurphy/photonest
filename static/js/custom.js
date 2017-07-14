@@ -2,21 +2,26 @@ $(document).ready(function() {
 
 	flexListener = galleryKeyboardShortcuts();
 
-	$(".gallery-image, .gallery-folder").first().addClass("active");
+	window.$imageObjectsArray = $('.gallery-image');
+	window.$folderObjectsArray = $('.gallery-folder');
+	window.$galleryObjectsArray = $('.gallery-image, .gallery-folder');
+	window.$metadataObjectsArray = $('.metadata-image, .metadata-folder');
 
-	$(".gallery-image a, .gallery-folder a").click(function(e) {
-		e.preventDefault();
+	// highlight first thumbnail and show associated metadata
+	$galleryObjectsArray.first().addClass('active');
+	$metadataObjectsArray.first().addClass('active')
 
-		$(".gallery-image, .gallery-folder").removeClass("active");
-		$(this).parents(".gallery-image, .gallery-folder").addClass("active");
+	$galleryObjectsArray.find('a').click(function(e) {
+		clickHandler(e, this, $galleryObjectsArray, $metadataObjectsArray);
 	});
 
-	$(".gallery-image").dblclick(function() {
+	$imageObjectsArray.dblclick(function() {
 		launchPhotoSwipe(this);
 	});
 
-	$(".gallery-folder").dblclick(function() {
-		window.location = $(this).find('a').attr("href");
+	$folderObjectsArray.dblclick(function() {
+		folderURI = $(this).find('a').attr("href");
+		window.location = folderURI;
 	});
 
 
@@ -37,9 +42,31 @@ $(document).ready(function() {
 
 });
 
+function clickHandler(e, _this) {
+	// prevent click from loading image in browser
+	e.preventDefault();
+
+	// change active thumbnail
+	$galleryObject = $(_this).parents('figure');
+	$galleryObjectsArray.removeClass('active');
+	$galleryObject.addClass('active');
+
+	updateMetadataSidebar($galleryObject);
+}
+
+function updateMetadataSidebar($galleryObject) {
+	// grab index of galleryObject
+	index = $galleryObject.attr('id').split('-')[1];
+	
+	// show active metadata in sidebar
+	$metadataObjectsArray.removeClass('active');
+	$metadataObject = $metadataObjectsArray.filter('#metadata-' + index);
+	$metadataObject.addClass('active');
+}
+
 function launchPhotoSwipe(galleryImage) {
 	$("#photoswipe-container").show();
-	photoIndex = $(galleryImage).attr('id');
+	photoIndex = $(galleryImage).attr('id').split('-')[1];
 	var pswp = initPhotoSwipe(photoIndex);
 	pswp.init();
 
@@ -48,8 +75,11 @@ function launchPhotoSwipe(galleryImage) {
 	});
 
 	pswp.listen('afterChange', function() {
-		$(".gallery-image").removeClass("active");
-		$(".gallery-image#" + pswp.currItem.el.id).addClass("active");
+		$imageObjectsArray.removeClass("active");
+		$imageObject = $imageObjectsArray.filter("#" + pswp.currItem.el.id);
+
+		$imageObject.addClass("active");
+		updateMetadataSidebar($imageObject);
 	});
 	
 	photoSwipeKeyboardShortcuts(flexListener, pswp);
@@ -92,7 +122,7 @@ function getPhotoSwipeItems() {
 		item = {
 			w: parseInt(size[0], 10),
 			h: parseInt(size[1], 10),
-			src: a.attr('href'),
+			src: a.attr('href') + '?raw=1',
 			msrc: img.attr('src'),
 			el: this
 		}

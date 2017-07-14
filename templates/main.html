@@ -14,34 +14,8 @@
       </div>
     </div>
 
-    <div class="col xl3 l4 m5 hide-on-small-only">
-
-      <div class="row">
-        <form class="col s12">
-          <div class="row">
-            <div class="input-field col s12">
-              <input id='text' type="text">
-              <label for="text">Text</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12">
-              <input id="email" type="email" class="validate">
-              <label for="email">Email</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col s12">
-              This is an inline input field:
-              <div class="input-field inline">
-                <input id="email" type="email" class="validate">
-                <label for="email" data-error="wrong" data-success="right">Email</label>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-
+    <div class="col xl3 l4 m5 hide-on-small-only metadata">
+      {% include 'metadata.html' %}
     </div>
 
   </div>

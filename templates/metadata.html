@@ -1,5 +1,25 @@
-{% extends "base.html" %}
 
-{% block content %}
 
-{% endblock %}
+{% for entry in file_entries %}
+
+    <div class="metadata-image" id="metadata-{{entry.index}}">
+        {% for key, value in entry.metadata.items %}
+            <div class="row">
+                <p>{{ key }}: {{ value }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endfor %}
+
+{% for entry in dir_entries %}
+
+    <div class="metadata-folder" id="metadata-{{entry.index}}">
+        {% for key, value in entry.metadata.items %}
+            <div class="row">
+                <p>{{ key }}: {{ value }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endfor %}
