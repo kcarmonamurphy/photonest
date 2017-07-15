@@ -6,19 +6,19 @@ class MetaData():
     def __init__(self, file_path): # this method creates the class object.
         self.file_path = file_path
 
+        try:
+            output = check_output(["exiftool", "-json", self.file_path])
+        except:
+            print("something went wrong")
+
+        self.metadataDict = json.loads(output)[0]
+
     def _getMetaData(self, key=None):
 
-        # try:
-        output = check_output(["exiftool", "-json", self.file_path])
-        # except:
-        #     pass
-
-        metadataDict = json.loads(output)[0]
-
         if key:
-        	return metadataDict.get(key, '')
+        	return self.metadataDict.get(key, '')
 
-        return metadataDict
+        return self.metadataDict
 
     def _setMetaData(self, key, value):
 
@@ -96,14 +96,6 @@ class MetaData():
     def setKeywords(self, value):
 
         return self._setMetaData("Keywords", value)
-
-    def getRating(self):
-
-        return self._getMetaData("Rating")
-
-    def setRating(self, value):
-
-        return self._setMetaData("Rating", value)
 
 
 

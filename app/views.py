@@ -36,9 +36,23 @@ def folder(request, abs_path):
                     'index': index,
                     'size': md.getImageSize(),
                     'metadata': {
-                        'image_size': md.getImageSize(),
-                        'file_size': md.getFileSize(),
-                        'file_type': md.getFileType()
+                        'writeable': {
+                            'Title': md.getTitle(),
+                            'Description': md.getDescription(),
+                            'Keywords': md.getKeywords(),
+                        },
+                        'read_only': {
+                            'Image Size': md.getImageSize(),
+                            'File Size': md.getFileSize(),
+                            'File Type': md.getFileType(),
+                            'Modify Date': md.getModifyDate(),
+                            'Create Date': md.getCreateDate(),
+                            'Make': md.getMake(),
+                            'Model': md.getModel(),
+                            'Megapixels': md.getMegapixels(),
+                            'Shutter Speed': md.getShutterSpeed(),
+                            'GPS Position': md.getGPSPosition(),
+                        }
                     }
                 })
                 index+=1

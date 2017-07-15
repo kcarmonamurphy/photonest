@@ -3,10 +3,30 @@
 {% for entry in file_entries %}
 
     <div class="metadata-image" id="metadata-{{entry.index}}">
-        {% for key, value in entry.metadata.items %}
+
+        {% for key, value in entry.metadata.writeable.items %}
+
             <div class="row">
-                <p>{{ key }}: {{ value }}</p>
+                <div class="input-field col s12">
+                    <input value="{{ value }}" id="metadata-{{entry.index}}-{{ key|slugify }}" type="text">
+                    <label for="metadata-{{entry.index}}-{{ key|slugify }}">{{ key }}</label>
+                </div>
             </div>
+ 
+        {% endfor %}
+
+        {% for key, value in entry.metadata.read_only.items %}
+
+            {% if value %}
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input disabled value="{{ value }}" id="metadata-{{entry.index}}-{{ key|slugify }}" type="text">
+                        <label for="metadata-{{entry.index}}-{{ key|slugify }}">{{ key }}</label>
+                    </div>
+                </div>
+            {% endif %}
+           
+ 
         {% endfor %}
     </div>
 
