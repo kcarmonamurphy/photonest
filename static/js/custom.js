@@ -1,5 +1,7 @@
 $(document).ready(function() {
 
+	$('.keywords .chips').material_chip();
+
 	flexListener = galleryKeyboardShortcuts();
 
 	window.$imageObjectsArray = $('.gallery-image');
@@ -23,7 +25,6 @@ $(document).ready(function() {
 		folderURI = $(this).find('a').attr("href");
 		window.location = folderURI;
 	});
-
 
 	var tapped=false
 	$(".gallery-image").on("touchstart",function(e){

@@ -2,33 +2,60 @@
 
 {% for entry in file_entries %}
 
-    <div class="metadata-image" id="metadata-{{entry.index}}">
+    <form class="metadata-image" id="metadata-{{entry.index}}">
 
-        {% for key, value in entry.metadata.writeable.items %}
+        <div class="form-inputs">
 
-            <div class="row">
+            <div class="row file-name">
                 <div class="input-field col s12">
-                    <input value="{{ value }}" id="metadata-{{entry.index}}-{{ key|slugify }}" type="text">
-                    <label for="metadata-{{entry.index}}-{{ key|slugify }}">{{ key }}</label>
+                        <input value="{{ entry.name }}" id="metadata-{{entry.index}}-file-name }}" type="text">
+                        <label for="metadata-{{entry.index}}-file-name">File Name</label>
                 </div>
             </div>
- 
-        {% endfor %}
 
-        {% for key, value in entry.metadata.read_only.items %}
+            {% for key, value in entry.metadata.writeable.items %}
 
-            {% if value %}
-                <div class="row">
+                <div class="row {{ key|slugify }}">
                     <div class="input-field col s12">
-                        <input disabled value="{{ value }}" id="metadata-{{entry.index}}-{{ key|slugify }}" type="text">
+                        <input value="{{ value }}" id="metadata-{{entry.index}}-{{ key|slugify }}" type="text">
                         <label for="metadata-{{entry.index}}-{{ key|slugify }}">{{ key }}</label>
                     </div>
                 </div>
-            {% endif %}
-           
- 
-        {% endfor %}
-    </div>
+     
+            {% endfor %}
+
+            <div class="row keywords">
+                <div class="input-field col s12">
+                        <div class="chips"></div>
+                        <label for="metadata-{{entry.index}}-name">Keywords</label>
+                </div>
+            </div>
+
+            {% for key, value in entry.metadata.read_only.items %}
+
+                {% if value %}
+                    <div class="row {{ key|slugify }}">
+                        <div class="input-field col s12">
+                            <input disabled value="{{ value }}" id="metadata-{{entry.index}}-{{ key|slugify }}" type="text">
+                            <label for="metadata-{{entry.index}}-{{ key|slugify }}">{{ key }}</label>
+                        </div>
+                    </div>
+                {% endif %}
+               
+     
+            {% endfor %}
+
+        </div>
+
+        <div class="row metadata-submit">
+            <button class="btn waves-effect waves-light" type="submit" name="action">Submit
+                <i class="material-icons right">done</i>
+            </button>
+        </div>
+
+       
+
+    </form>
 
 {% endfor %}
 

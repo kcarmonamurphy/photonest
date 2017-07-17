@@ -39,7 +39,7 @@ def folder(request, abs_path):
                         'writeable': {
                             'Title': md.getTitle(),
                             'Description': md.getDescription(),
-                            'Keywords': md.getKeywords(),
+                            # 'Keywords': md.getKeywords(),
                         },
                         'read_only': {
                             'Image Size': md.getImageSize(),

@@ -193,19 +193,49 @@ main {
 	display: none;
 
 	&.active {
-		display:block;
+		display:flex;
+		flex-direction:column;
+		height:100%;
 	}
 }
 
 .metadata {
 
-	overflow-y:scroll;
-
 	.input-field input {
 		margin: 0 !important;
 	}
+
+	.form-inputs {
+		flex: 1;
+		overflow-y:scroll;
+	}
+
 }
 
+.file-name {
+
+	margin-top:20px;
+
+	.input-field input {
+		height:4rem;
+		font-size:30px;
+	}
+}
+
+.metadata-submit {
+    background-color: grey;
+    width: 100%;
+    margin-bottom: 0;
+    padding: 10px;
+
+    button {
+    	float:right;
+    }
+}
+
+.chips {
+	margin-bottom:0;
+}
 
 
 
