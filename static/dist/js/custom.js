@@ -2,46 +2,53 @@ $(document).ready(function() {
 
 	$('.keywords .chips').material_chip();
 
-	flexListener = galleryKeyboardShortcuts();
-
-	window.$imageObjectsArray = $('.gallery-image');
-	window.$folderObjectsArray = $('.gallery-folder');
-	window.$galleryObjectsArray = $('.gallery-image, .gallery-folder');
-	window.$metadataObjectsArray = $('.metadata-image, .metadata-folder');
+	// defome global jQuery objects
+	$imageObjectsArray = $('.gallery-image');
+	$folderObjectsArray = $('.gallery-folder');
+	$galleryObjectsArray = $('.gallery-image, .gallery-folder');
+	$metadataObjectsArray = $('.metadata-image, .metadata-folder');
 
 	// highlight first thumbnail and show associated metadata
 	$galleryObjectsArray.first().addClass('active');
 	$metadataObjectsArray.first().addClass('active')
 
+	// initialize interaction controls
+	initKeyboardControls();
+	initClickControls()
+
+});
+
+function initClickControls() {
 	$galleryObjectsArray.find('a').click(function(e) {
-		clickHandler(e, this, $galleryObjectsArray, $metadataObjectsArray);
+		clickHandler(e, this);
 	});
 
 	$imageObjectsArray.dblclick(function() {
-		launchPhotoSwipe(this);
+		launchPhotoSwipe($(this));
 	});
 
 	$folderObjectsArray.dblclick(function() {
 		folderURI = $(this).find('a').attr("href");
-		window.location = folderURI;
+		window.location.href = folderURI;
 	});
 
 	var tapped=false
-	$(".gallery-image").on("touchstart",function(e){
+	$imageObjectsArray.on("touchstart",function(e){
 	    if(!tapped){ //if tap is not set, set up single tap
 	      tapped=setTimeout(function(){
 	          tapped=null
 	          //insert things you want to do when single tapped
+	          clickHandler(e, this);
 	      },300);   //wait 300ms then run single click code
 	    } else {    //tapped within 300ms of last tap. double tap
 	      clearTimeout(tapped); //stop single tap callback
 	      tapped=null
 	      //insert things you want to do when double tapped
+	      launchPhotoSwipe($(this));
 	    }
     	e.preventDefault()
 	});
-
-});
+}
 
 function clickHandler(e, _this) {
 	// prevent click from loading image in browser
@@ -55,20 +62,10 @@ function clickHandler(e, _this) {
 	updateMetadataSidebar($galleryObject);
 }
 
-function updateMetadataSidebar($galleryObject) {
-	// grab index of galleryObject
-	index = $galleryObject.attr('id').split('-')[1];
-	
-	// show active metadata in sidebar
-	$metadataObjectsArray.removeClass('active');
-	$metadataObject = $metadataObjectsArray.filter('#metadata-' + index);
-	$metadataObject.addClass('active');
-}
-
-function launchPhotoSwipe(galleryImage) {
+function launchPhotoSwipe($galleryImage) {
 	$("#photoswipe-container").show();
-	photoIndex = $(galleryImage).attr('id').split('-')[1];
-	var pswp = initPhotoSwipe(photoIndex);
+	photoIndex = $galleryImage.attr('id').split('-')[1];
+	pswp = initPhotoSwipe(photoIndex);
 	pswp.init();
 
 	pswp.listen('close', function() { 
@@ -82,34 +79,9 @@ function launchPhotoSwipe(galleryImage) {
 		$imageObject.addClass("active");
 		updateMetadataSidebar($imageObject);
 	});
-	
-	photoSwipeKeyboardShortcuts(flexListener, pswp);
+
+	return pswp;
 }
-
-function photoSwipeKeyboardShortcuts(flexListener, pswp) {
-	var pswpKeypressListener = new window.keypress.Listener();
-
-	pswpKeypressListener.simple_combo("shift _", function() {
-	    pswp.zoomTo(pswp.getZoomLevel()/1.5, {x:pswp.viewportSize.x/2,y:pswp.viewportSize.y/2}, 50, false, function(now) {
-		});
-	});
-
-	pswpKeypressListener.simple_combo("shift +", function() {
-	    pswp.zoomTo(pswp.getZoomLevel()*1.5, {x:pswp.viewportSize.x/2,y:pswp.viewportSize.y/2}, 50, false, function(now) {
-		});
-	});
-
-	$('input, textarea')
-    	.bind("focus", function() { pswpKeypressListener.stop_listening(); })
-		.bind("blur", function() { pswpKeypressListener.listen(); });
-
-	flexListener.stop_listening();
-
-	pswp.listen('close', function() {
-		flexListener.listen();
-	});
-}
-
 
 function getPhotoSwipeItems() {
 	var images = $(".gallery-image");
@@ -149,6 +121,7 @@ function initPhotoSwipe(index) {
 	    closeOnScroll: false,
 	    escKey: true,
 	    history: false,
+	    preload: [4,4],
 	    getThumbBoundsFn: function(index) {
             var thumbnail = items[index].el.getElementsByTagName('img')[0];
                 rect = thumbnail.getBoundingClientRect();

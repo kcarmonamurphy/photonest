@@ -1,4 +1,11 @@
-$(document).ready(function() {
+function updateMetadataSidebar($galleryObject) {
+	// grab index of galleryObject
+	index = $galleryObject.attr('id').split('-')[1];
+	
+	// show active metadata in sidebar
+	$metadataObjectsArray.removeClass('active');
+	$metadataObject = $metadataObjectsArray.filter('#metadata-' + index);
+	$metadataObject.addClass('active');
 
 	$('.metadata-image.active').submit(function(e) {
 
@@ -14,5 +21,4 @@ $(document).ready(function() {
 		
 		console.log(data);
 	});
-
-});
+}

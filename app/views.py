@@ -13,7 +13,8 @@ def folder(request, abs_path):
 
     file_entries = []
     dir_entries = []
-    index = 0
+    file_index = 0
+    dir_index = 0
 
     for entry in os.scandir(abs_path):
 
@@ -21,9 +22,9 @@ def folder(request, abs_path):
             dir_entries.append({
                 'uri': getGalleryURI(entry.path),
                 'name': entry.name,
-                'index': index
+                'index': dir_index
             })
-            index+=1
+            dir_index+=1
 
         if not entry.name.startswith('.') and entry.is_file():
             md = MetaData(entry.path)
@@ -33,7 +34,7 @@ def folder(request, abs_path):
                 file_entries.append({
                     'uri': getGalleryURI(entry.path),
                     'name': entry.name,
-                    'index': index,
+                    'index': file_index,
                     'size': md.getImageSize(),
                     'metadata': {
                         'writeable': {
@@ -55,7 +56,7 @@ def folder(request, abs_path):
                         }
                     }
                 })
-                index+=1
+                file_index+=1
             
 
     context = {
