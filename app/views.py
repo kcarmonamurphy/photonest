@@ -36,29 +36,10 @@ def folder(request, abs_path):
                     'name': entry.name,
                     'index': file_index,
                     'size': md.getImageSize(),
-                    'metadata': {
-                        'writeable': {
-                            'Title': md.getTitle(),
-                            'Description': md.getDescription(),
-                            # 'Keywords': md.getKeywords(),
-                        },
-                        'read_only': {
-                            'Image Size': md.getImageSize(),
-                            'File Size': md.getFileSize(),
-                            'File Type': md.getFileType(),
-                            'Modify Date': md.getModifyDate(),
-                            'Create Date': md.getCreateDate(),
-                            'Make': md.getMake(),
-                            'Model': md.getModel(),
-                            'Megapixels': md.getMegapixels(),
-                            'Shutter Speed': md.getShutterSpeed(),
-                            'GPS Position': md.getGPSPosition(),
-                        }
-                    }
+                    'metadata': getMetadata(md)
                 })
                 file_index+=1
             
-
     context = {
         'folder_path': path,
         'file_entries': file_entries,
@@ -66,6 +47,28 @@ def folder(request, abs_path):
     }
     
     return render(request, 'main.html', context)
+
+def setMetadata(md):
+    pass
+
+def getMetadata(md):
+    return {
+        'Title': md.getTitle(),
+        'Description': md.getDescription(),
+        'Keywords': md.getKeywords(),
+        'read_only': {
+            'Image Size': md.getImageSize(),
+            'File Size': md.getFileSize(),
+            'File Type': md.getFileType(),
+            'Modify Date': md.getModifyDate(),
+            'Create Date': md.getCreateDate(),
+            'Make': md.getMake(),
+            'Model': md.getModel(),
+            'Megapixels': md.getMegapixels(),
+            'Shutter Speed': md.getShutterSpeed(),
+            'GPS Position': md.getGPSPosition(),
+        }
+    }
 
 def photo(request, path):
  
@@ -82,22 +85,6 @@ def raw(request, path):
             return HttpResponse(file.read(), content_type="image/jpeg")
     except IOError:
         raise Exception("issue opening image")
-
-def metadata(request, path):
-
-    full_path = os.path.join(settings.GALLERY_DIR, path)
-
-    md = MetaData(full_path)
-
-    context = {
-        'read_only_properties': {
-            'image_size': str(md.getImageSize()),
-            'file_size': str(md.getFileSize()),
-            'file_type': str(md.getFileType())
-        }
-    }
-
-    return render(request, 'metadata.html', context)
 
 
 def path(request, path):

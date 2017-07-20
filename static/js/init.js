@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-	$('.keywords .chips').material_chip();
+
 
 	// defome global jQuery objects
 	$imageObjectsArray = $('.gallery-image');
@@ -9,18 +9,26 @@ $(document).ready(function() {
 	$metadataObjectsArray = $('.metadata-image, .metadata-folder');
 
 	// highlight first thumbnail and show associated metadata
-	$galleryObjectsArray.first().addClass('active');
-	$metadataObjectsArray.first().addClass('active')
+	initActiveGalleryObject();
+	initKeywordChips();
 
 	// initialize interaction controls
 	initKeyboardControls();
-	initClickControls()
+	initClickControls();
+	configureSubmit();
+
+
 
 });
 
+function initActiveGalleryObject() {
+	$galleryObjectsArray.first().addClass('active');
+	$metadataObjectsArray.first().addClass('active')
+}
+
 function initClickControls() {
 	$galleryObjectsArray.find('a').click(function(e) {
-		clickHandler(e, this);
+		highlightActiveGalleryObject(e, this);
 	});
 
 	$imageObjectsArray.dblclick(function() {
@@ -38,7 +46,7 @@ function initClickControls() {
 	      tapped=setTimeout(function(){
 	          tapped=null
 	          //insert things you want to do when single tapped
-	          clickHandler(e, this);
+	          highlightActiveGalleryObject(e, this);
 	      },300);   //wait 300ms then run single click code
 	    } else {    //tapped within 300ms of last tap. double tap
 	      clearTimeout(tapped); //stop single tap callback
@@ -50,21 +58,24 @@ function initClickControls() {
 	});
 }
 
-function clickHandler(e, _this) {
+function highlightActiveGalleryObject(e, target) {
 	// prevent click from loading image in browser
 	e.preventDefault();
 
 	// change active thumbnail
-	$galleryObject = $(_this).parents('figure');
+	$galleryObject = $(target).parents('figure');
 	$galleryObjectsArray.removeClass('active');
 	$galleryObject.addClass('active');
 
 	updateMetadataSidebar($galleryObject);
+
+	// uri = [location.href, $galleryObject.find('figcaption').text()].join('/');
+	// history.replaceState(null, null, uri);
 }
 
 function launchPhotoSwipe($galleryImage) {
 	$("#photoswipe-container").show();
-	photoIndex = $galleryImage.attr('id').split('-')[1];
+	photoIndex = $galleryImage.attr('id').split('-')[2];
 	pswp = initPhotoSwipe(photoIndex);
 	pswp.init();
 

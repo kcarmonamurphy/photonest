@@ -1,0 +1,48 @@
+<div class="row file-name">
+    <div class="input-field col s12">
+        <input value="{{ entry.name }}" id="metadata-{{entry.index}}-file-name }}" type="text">
+        <label for="metadata-{{entry.index}}-file-name">File Name</label>
+    </div>
+</div>
+
+<div class="row title">
+    <div class="input-field col s12">
+        <input value="{{ entry.metadata.Title }}" id="metadata-{{entry.index}}-title" type="text">
+        <label for="metadata-{{entry.index}}-title">Title</label>
+    </div>
+</div>
+
+<div class="row description">
+    <div class="input-field col s12">
+        <input value="{{ entry.metadata.Description }}" id="metadata-{{entry.index}}-description" type="text">
+        <label for="metadata-{{entry.index}}-description">Description</label>
+    </div>
+</div>
+
+<div class="row keywords">
+    <div class="input-field col s12">
+        <div class="chips">
+        {% for value in entry.metadata.Keywords %}
+            <div class="chip">
+                <span>{{value}}</span>
+                <i class="close material-icons">close</i>
+            </div>
+        {% endfor %}
+        </div>
+        <label for="metadata-{{entry.index}}-keywords">Keywords</label>
+    </div>
+</div>
+
+{% for key, value in entry.metadata.read_only.items %}
+
+    {% if value %}
+        <div class="row {{ key|slugify }}">
+            <div class="input-field col s12">
+                <input disabled value="{{ value }}" id="metadata-{{entry.index}}-{{ key|slugify }}" type="text">
+                <label for="metadata-{{entry.index}}-{{ key|slugify }}">{{ key }}</label>
+            </div>
+        </div>
+    {% endif %}
+   
+
+{% endfor %}

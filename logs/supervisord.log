@@ -112,3 +112,23 @@
 2017-07-18 01:37:34,261 INFO spawned: 'notebook' with pid 8
 2017-07-18 01:37:35,264 INFO success: web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
 2017-07-18 01:37:35,265 INFO success: notebook entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-07-19 00:36:44,450 WARN received SIGTERM indicating exit request
+2017-07-19 00:36:44,488 INFO waiting for web, notebook to die
+2017-07-19 00:36:45,826 INFO stopped: notebook (exit status 0)
+2017-07-19 00:36:45,963 INFO stopped: web (terminated by SIGTERM)
+2017-07-19 00:36:55,870 CRIT Supervisor running as root (no user in config file)
+2017-07-19 00:36:55,883 INFO supervisord started with pid 1
+2017-07-19 00:36:56,887 INFO spawned: 'web' with pid 7
+2017-07-19 00:36:56,894 INFO spawned: 'notebook' with pid 8
+2017-07-19 00:36:57,897 INFO success: web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-07-19 00:36:57,899 INFO success: notebook entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-07-19 04:36:45,287 WARN received SIGTERM indicating exit request
+2017-07-19 04:36:45,346 INFO waiting for web, notebook to die
+2017-07-19 04:36:47,273 INFO stopped: notebook (exit status 0)
+2017-07-19 04:36:47,350 INFO stopped: web (terminated by SIGTERM)
+2017-07-19 22:16:06,257 CRIT Supervisor running as root (no user in config file)
+2017-07-19 22:16:06,269 INFO supervisord started with pid 1
+2017-07-19 22:16:07,275 INFO spawned: 'web' with pid 7
+2017-07-19 22:16:07,281 INFO spawned: 'notebook' with pid 8
+2017-07-19 22:16:08,285 INFO success: web entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-07-19 22:16:08,286 INFO success: notebook entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)

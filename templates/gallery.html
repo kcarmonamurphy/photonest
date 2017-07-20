@@ -3,30 +3,26 @@
 <div id="flex-container" class="flex-4">
 
 	{% for entry in file_entries %}
-	<figure class="gallery-image" id="gallery-{{entry.index}}" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+	<figure class="gallery-image" id="g-i-{{entry.index}}" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
 
 		<div class="selection-boundary">
 		    <a href="{{ entry.uri | urlencode }}" itemprop="contentUrl" data-size="{{entry.size}}">
 		        <img src="{{ entry.uri | urlencode }}?raw=1" itemprop="thumbnail" alt="{{entry.name}}" />
 		    </a>
 
-		    <figcaption itemprop="caption description">
-		        {{entry.name}}
-		    </figcaption>
+		    <figcaption itemprop="caption description">{{entry.name}}</figcaption>
 		</div>
 	</figure>
 	{% endfor %}
 
 	{% for entry in dir_entries %}
-	<figure class="gallery-folder" id="gallery-{{entry.index}}" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+	<figure class="gallery-folder" id="g-f-{{entry.index}}" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
 		<div class="selection-boundary">
 		    <a href="{{ entry.uri | urlencode }}" itemprop="contentUrl" data-size="{{entry.size}}">
 		        <img src="{% static 'images/folder.png' %}" itemprop="thumbnail" alt="{{entry.name}}" />
 		    </a>
 
-		    <figcaption itemprop="caption description">
-		        {{entry.name}}
-		    </figcaption>
+		    <figcaption itemprop="caption description">{{entry.name}}</figcaption>
 		</div>
 	</figure>
 	{% endfor %}
