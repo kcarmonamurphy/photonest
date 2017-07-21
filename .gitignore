@@ -4,3 +4,6 @@ collection/*
 .ipynb_checkpoints/*
 gallery/*
 node_modules/*
+logs/*
+static/dist/*
+app/__pycache__/*

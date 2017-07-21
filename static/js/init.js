@@ -1,7 +1,5 @@
 $(document).ready(function() {
 
-
-
 	// defome global jQuery objects
 	$imageObjectsArray = $('.gallery-image');
 	$folderObjectsArray = $('.gallery-folder');
@@ -17,18 +15,15 @@ $(document).ready(function() {
 	initClickControls();
 	configureSubmit();
 
-
-
 });
 
 function initActiveGalleryObject() {
 	$galleryObjectsArray.first().addClass('active');
-	$metadataObjectsArray.first().addClass('active')
 }
 
 function initClickControls() {
 	$galleryObjectsArray.find('a').click(function(e) {
-		highlightActiveGalleryObject(e, this);
+		singleClickHandler(e, this);
 	});
 
 	$imageObjectsArray.dblclick(function() {
@@ -46,7 +41,7 @@ function initClickControls() {
 	      tapped=setTimeout(function(){
 	          tapped=null
 	          //insert things you want to do when single tapped
-	          highlightActiveGalleryObject(e, this);
+	          singleClickHandler(e, this);
 	      },300);   //wait 300ms then run single click code
 	    } else {    //tapped within 300ms of last tap. double tap
 	      clearTimeout(tapped); //stop single tap callback
@@ -58,7 +53,7 @@ function initClickControls() {
 	});
 }
 
-function highlightActiveGalleryObject(e, target) {
+function singleClickHandler(e, target) {
 	// prevent click from loading image in browser
 	e.preventDefault();
 
@@ -66,21 +61,20 @@ function highlightActiveGalleryObject(e, target) {
 	$galleryObject = $(target).parents('figure');
 	$galleryObjectsArray.removeClass('active');
 	$galleryObject.addClass('active');
-
-	updateMetadataSidebar($galleryObject);
-
-	// uri = [location.href, $galleryObject.find('figcaption').text()].join('/');
-	// history.replaceState(null, null, uri);
 }
 
 function launchPhotoSwipe($galleryImage) {
-	$("#photoswipe-container").show();
+	$("#photoswipe-container").show().removeClass('closed');
+
 	photoIndex = $galleryImage.attr('id').split('-')[2];
 	pswp = initPhotoSwipe(photoIndex);
 	pswp.init();
 
+	setFileURI($galleryImage);
+
 	pswp.listen('close', function() { 
-		$("#photoswipe-container").fadeOut(500);
+		revertToBaseURI();
+		$("#photoswipe-container").addClass('closed').fadeOut(500);
 	});
 
 	pswp.listen('afterChange', function() {
@@ -133,6 +127,7 @@ function initPhotoSwipe(index) {
 	    escKey: true,
 	    history: false,
 	    preload: [4,4],
+	    arrowKeys: false,
 	    getThumbBoundsFn: function(index) {
             var thumbnail = items[index].el.getElementsByTagName('img')[0];
                 rect = thumbnail.getBoundingClientRect();

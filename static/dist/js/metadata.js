@@ -29,8 +29,6 @@ function updateMetadataSidebar($galleryObject) {
 	// grab index of galleryObject
 	metadataType = $galleryObject.attr('id').split('-')[1];
 	index = $galleryObject.attr('id').split('-')[2];
-
-	console.log($galleryObject);
 	
 	// show active metadata in sidebar
 	$metadataObjectsArray.removeClass('active');

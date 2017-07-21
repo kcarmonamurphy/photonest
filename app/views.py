@@ -43,7 +43,8 @@ def folder(request, abs_path):
     context = {
         'folder_path': path,
         'file_entries': file_entries,
-        'dir_entries': dir_entries
+        'dir_entries': dir_entries,
+        'base_url': getGalleryURI(abs_path)
     }
     
     return render(request, 'main.html', context)
