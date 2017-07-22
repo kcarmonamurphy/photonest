@@ -1,24 +1,39 @@
 $(document).ready(function() {
 
-	// defome global jQuery objects
+	// define global jQuery objects
 	$imageObjectsArray = $('.gallery-image');
 	$folderObjectsArray = $('.gallery-folder');
 	$galleryObjectsArray = $('.gallery-image, .gallery-folder');
 	$metadataObjectsArray = $('.metadata-image, .metadata-folder');
 
-	// highlight first thumbnail and show associated metadata
-	initActiveGalleryObject();
+	// check if supposed to load gallery image
+	if ($(".image-index").length) {
+		var imageIndex = $(".image-index").text();
+		$galleryImage = $('#g-i-' + imageIndex);
+		initActiveGalleryObject($galleryImage);
+		launchPhotoSwipe($galleryImage);
+	} else {
+		initActiveGalleryObject();
+	}
+
+	// normalize keyword data in chips
 	initKeywordChips();
 
 	// initialize interaction controls
 	initKeyboardControls();
 	initClickControls();
+
+	// run submit handlers
 	configureSubmit();
 
 });
 
-function initActiveGalleryObject() {
-	$galleryObjectsArray.first().addClass('active');
+function initActiveGalleryObject($galleryImage) {
+	if ($galleryImage) {
+		$galleryImage.addClass('active');
+	} else {
+		$galleryObjectsArray.first().addClass('active');
+	}
 }
 
 function initClickControls() {

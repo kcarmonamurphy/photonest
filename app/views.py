@@ -9,14 +9,15 @@ import magic
 from modules.metadata import MetaData
 from modules.path_helper import *
 
-def folder(request, abs_path):
+def buildContext(dir_path, file_path=None):
 
     file_entries = []
     dir_entries = []
     file_index = 0
     dir_index = 0
+    image_index = None
 
-    for entry in os.scandir(abs_path):
+    for entry in os.scandir(dir_path):
 
         if not entry.name.startswith('.') and entry.is_dir():
             dir_entries.append({
@@ -31,6 +32,10 @@ def folder(request, abs_path):
             mime_type = magic.from_file(entry.path, mime=True)
             mime_category = mime_type.split('/')
             if mime_category[0] == 'image':
+
+                if file_path == entry.path:
+                    image_index = file_index
+
                 file_entries.append({
                     'uri': getGalleryURI(entry.path),
                     'name': entry.name,
@@ -44,10 +49,11 @@ def folder(request, abs_path):
         'folder_path': path,
         'file_entries': file_entries,
         'dir_entries': dir_entries,
-        'base_url': getGalleryURI(abs_path)
+        'base_url': getGalleryURI(dir_path),
+        'image_index': image_index
     }
     
-    return render(request, 'main.html', context)
+    return context
 
 def setMetadata(md):
     pass
@@ -70,12 +76,6 @@ def getMetadata(md):
             'GPS Position': md.getGPSPosition(),
         }
     }
-
-def photo(request, path):
- 
-    context = {'filename': path }
-
-    return render(request, 'main.html', context)
 
 def raw(request, path):
 
@@ -107,4 +107,19 @@ def path(request, path):
         return photo(request, abs_path)
 
     raise Http404("Haven't found shit")
+
+
+def photo(request, file_path):
+
+    dir_path = os.path.dirname(file_path)
+
+    context = buildContext(dir_path, file_path)
+
+    return render(request, 'main.html', context)
+
+def folder(request, dir_path):
+
+    context = buildContext(dir_path)
+
+    return render(request, 'main.html', context)
 
