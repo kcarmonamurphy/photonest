@@ -5,6 +5,7 @@ $(document).ready(function() {
 	$folderObjectsArray = $('.gallery-folder');
 	$galleryObjectsArray = $('.gallery-image, .gallery-folder');
 	$metadataObjectsArray = $('.metadata-image, .metadata-folder');
+	$photoSwipeContainer = $("#photoswipe-container");
 
 	// check if supposed to load gallery image
 	if ($(".image-index").length) {
@@ -26,7 +27,27 @@ $(document).ready(function() {
 	// run submit handlers
 	configureSubmit();
 
+	/// csrf
+	configureCSRF();
+	
+
 });
+
+function configureCSRF() {
+	var csrftoken = Cookies.get('csrftoken');
+	$.ajaxSetup({
+	    beforeSend: function(xhr, settings) {
+	        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+	            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+	        }
+	    }
+	});
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
 
 function initActiveGalleryObject($galleryImage) {
 	if ($galleryImage) {
@@ -79,9 +100,10 @@ function singleClickHandler(e, target) {
 }
 
 function launchPhotoSwipe($galleryImage) {
-	$("#photoswipe-container").show().removeClass('closed');
+	$photoSwipeContainer.show().removeClass('closed');
 
 	photoIndex = $galleryImage.attr('id').split('-')[2];
+
 	pswp = initPhotoSwipe(photoIndex);
 	pswp.init();
 
@@ -89,7 +111,7 @@ function launchPhotoSwipe($galleryImage) {
 
 	pswp.listen('close', function() { 
 		revertToBaseURI();
-		$("#photoswipe-container").addClass('closed').fadeOut(500);
+		$photoSwipeContainer.addClass('closed').fadeOut(500);
 	});
 
 	pswp.listen('afterChange', function() {
@@ -97,7 +119,6 @@ function launchPhotoSwipe($galleryImage) {
 		$imageObject = $imageObjectsArray.filter("#" + pswp.currItem.el.id);
 
 		$imageObject.addClass("active");
-		updateMetadataSidebar($imageObject);
 	});
 
 	return pswp;

@@ -10,20 +10,20 @@ gulp.task('serve', ['less', 'js'], function() {
 		ui: false
     });
 
-    gulp.watch("static/less/*.less", ['less']).on('change', browserSync.reload);
-    gulp.watch("static/js/*.js", ['js']).on('change', browserSync.reload);
+    gulp.watch("less/*.less", ['less']).on('change', browserSync.reload);
+    gulp.watch("js/*.js", ['js']).on('change', browserSync.reload);
     gulp.watch("templates/*.html").on('change', browserSync.reload);
 });
 
 gulp.task('less', function() {
-  return gulp.src('static/less/*.less')
+  return gulp.src('less/*.less')
     .pipe(less())
     .pipe(minifyCSS())
     .pipe(gulp.dest('static/dist/css'))
 });
 
 gulp.task('js', function () {
-  return gulp.src('static/js/*js')
+  return gulp.src('js/*js')
     .pipe(gulp.dest('static/dist/js'));
 });
 

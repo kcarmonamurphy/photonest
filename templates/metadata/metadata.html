@@ -1,18 +1,12 @@
 {% for entry in file_entries %}
 
-    <form class="metadata-image" id="m-i-{{entry.index}}">
+    <form class="metadata-image" id="m-i-{{entry.index}}" action="{{entry.uri}}">
 
         <div class="form-inputs">
             {% include 'metadata/image-form-inputs.html' %}
         </div>
 
-        <div class="row metadata-submit">
-            <button class="btn waves-effect waves-light" type="submit" name="action">Submit
-                <i class="material-icons right">done</i>
-            </button>
-        </div>
-
-       
+        {% include 'metadata/submit.html' %}
 
     </form>
 
@@ -20,17 +14,13 @@
 
 {% for entry in dir_entries %}
 
-    <form class="metadata-folder" id="m-f-{{entry.index}}">
+    <form class="metadata-folder" id="m-f-{{entry.index}}" action="{{entry.uri}}">
 
         <div class="form-inputs">
             {% include 'metadata/folder-form-inputs.html' %}
         </div>
 
-        <div class="row metadata-submit">
-            <button class="btn waves-effect waves-light" type="submit" name="action">Submit
-                <i class="material-icons right">done</i>
-            </button>
-        </div>
+        {% include 'metadata/submit.html' %}
 
     </form>
 

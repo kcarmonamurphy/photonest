@@ -1,15 +1,17 @@
 from django.http import HttpResponse
 from django.http import Http404
+from django.http import JsonResponse
 from django.shortcuts import render
 
 from django.conf import settings
 import os
 import magic
+import json
 
 from modules.metadata import MetaData
 from modules.path_helper import *
 
-def buildContext(dir_path, file_path=None):
+def _buildContext(dir_path, file_path=None):
 
     file_entries = []
     dir_entries = []
@@ -41,7 +43,7 @@ def buildContext(dir_path, file_path=None):
                     'name': entry.name,
                     'index': file_index,
                     'size': md.getImageSize(),
-                    'metadata': getMetadata(md)
+                    'metadata': _getMetadata(md)
                 })
                 file_index+=1
             
@@ -55,10 +57,7 @@ def buildContext(dir_path, file_path=None):
     
     return context
 
-def setMetadata(md):
-    pass
-
-def getMetadata(md):
+def _getMetadata(md):
     return {
         'Title': md.getTitle(),
         'Description': md.getDescription(),
@@ -76,6 +75,23 @@ def getMetadata(md):
             'GPS Position': md.getGPSPosition(),
         }
     }
+
+def metadata(request, path):
+
+    data = json.loads(request.POST.get('data'))
+
+    full_path = os.path.join(settings.GALLERY_DIR, path)
+
+    md = MetaData(full_path)
+
+    md.setTitle(data.get('title'))
+    md.setDescription(data.get('description'))
+    md.setKeywords(data.get('keywords'))
+
+    if md.write():
+        return JsonResponse({'status':'200'})
+
+    return JsonResponse({'status': '500'})
 
 def raw(request, path):
 
@@ -101,25 +117,25 @@ def path(request, path):
         raise Exception('bad path')
 
     if os.path.isdir(abs_path):
-        return folder(request, abs_path)
+        return _folder(request, abs_path)
 
     if os.path.isfile(abs_path):
-        return photo(request, abs_path)
+        return _photo(request, abs_path)
 
     raise Http404("Haven't found shit")
 
 
-def photo(request, file_path):
+def _photo(request, file_path):
 
     dir_path = os.path.dirname(file_path)
 
-    context = buildContext(dir_path, file_path)
+    context = _buildContext(dir_path, file_path)
 
     return render(request, 'main.html', context)
 
-def folder(request, dir_path):
+def _folder(request, dir_path):
 
-    context = buildContext(dir_path)
+    context = _buildContext(dir_path)
 
     return render(request, 'main.html', context)
 

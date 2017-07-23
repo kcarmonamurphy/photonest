@@ -3,14 +3,24 @@ function configureSubmit() {
 
 		e.preventDefault();
 
-		var data = {
-			'file-name': $(this).find('.file-name input').val(),
-			'title': $(this).find('.title input').val(),
-			'description': $(this).find('.description input').val(),
-			'keywords': getKeywordChips($(this))
+		$form = $(this);
+
+		var formInputs = {
+			'file-name': $form.find('.file-name input').val(),
+			'title': $form.find('.title input').val(),
+			'description': $form.find('.description input').val(),
+			'keywords': getKeywordChips($form)
 		}
+
+		var endpoint = $form.attr('action') + '?metadata=1';
+		var data = { 'data': JSON.stringify(formInputs) }
 		
-		console.log(data);
+		$.post(endpoint, data, function(resp) {
+			if (resp.status == '200') {
+				$form.addClass('form-success');
+			}
+		});
+		
 	});
 
 	$('.metadata-folder').submit(function(e) {
