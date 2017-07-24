@@ -1,4 +1,43 @@
 function configureSubmit() {
+
+	$('.metadata-image').each(function() {
+		$form = $(this);
+
+		origFormInputs = {
+			'file-name': $form.find('.file-name input').val(),
+			'title': $form.find('.title input').val(),
+			'description': $form.find('.description input').val(),
+			'keywords': getKeywordChips($form)
+		}
+	});
+
+	$('.metadata-image').on('input', function() {
+
+		$form = $(this);
+
+		var origFormInputs = {
+			'file-name': $form.find('.file-name input')[0].defaultValue,
+			'title': $form.find('.title input')[0].defaultValue,
+			'description': $form.find('.description input')[0].defaultValue,
+			'keywords': eval($form.find('.keywords input[type="hidden"]')[0].defaultValue).toString()
+		}
+
+		var formInputs = {
+			'file-name': $form.find('.file-name input').val(),
+			'title': $form.find('.title input').val(),
+			'description': $form.find('.description input').val(),
+			'keywords': getKeywordChips($form)
+		}
+
+		for (var key in formInputs) {
+		  if (formInputs.hasOwnProperty(key)) {
+		    console.log(key + " / " + origFormInputs[key] + " / " + formInputs[key]);
+		  }
+		}
+
+
+	});
+
 	$('.metadata-image').submit(function(e) {
 
 		e.preventDefault();
@@ -17,10 +56,13 @@ function configureSubmit() {
 		
 		$.post(endpoint, data, function(resp) {
 			if (resp.status == '200') {
-				$form.addClass('form-success');
+				$form.css({backgroundColor:'#b2ff59'});
+				$form.animate({backgroundColor: 'white'}, 2000);
+				$form.removeClass('dirty');
+				$form.find('[type=submit]').addClass('disabled');
 			}
 		});
-		
+
 	});
 
 	$('.metadata-folder').submit(function(e) {

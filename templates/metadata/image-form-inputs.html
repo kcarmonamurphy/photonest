@@ -31,6 +31,7 @@
         </div>
         <label for="metadata-{{entry.index}}-keywords">Keywords</label>
     </div>
+    <input type='hidden' value="{{entry.metadata.Keywords}}">
 </div>
 
 {% for key, value in entry.metadata.read_only.items %}

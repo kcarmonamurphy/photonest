@@ -4,9 +4,9 @@
   "description": "Databaseless photo manager",
   "main": "manage.py",
   "dependencies": {
+    "js-cookie": "^2.1.4",
     "materialize-css": "^0.99.0",
-    "photoswipe": "^4.1.2",
-    "js-cookie": "^2.1.4"
+    "photoswipe": "^4.1.2"
   },
   "devDependencies": {
     "browser-sync": "^2.18.12",
