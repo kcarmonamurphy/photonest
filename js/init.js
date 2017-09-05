@@ -27,6 +27,8 @@ $(document).ready(function() {
 	// run submit handlers
 	configureSubmit();
 
+	dirtyFormHandlers();
+
 	/// csrf
 	configureCSRF();
 	

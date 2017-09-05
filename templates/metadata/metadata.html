@@ -2,6 +2,8 @@
 
     <form class="metadata-image" id="m-i-{{entry.index}}" action="{{entry.uri}}">
 
+        {% csrf_token %}
+
         <div class="form-inputs">
             {% include 'metadata/image-form-inputs.html' %}
         </div>
@@ -15,6 +17,8 @@
 {% for entry in dir_entries %}
 
     <form class="metadata-folder" id="m-f-{{entry.index}}" action="{{entry.uri}}">
+
+        {% csrf_token %}
 
         <div class="form-inputs">
             {% include 'metadata/folder-form-inputs.html' %}

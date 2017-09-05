@@ -1,42 +1,66 @@
-function configureSubmit() {
+function isFormDirty($form) {
 
-	$('.metadata-image').each(function() {
-		$form = $(this);
+	var origFormInputs = {
+		'file-name': $form.find('.file-name input')[0].defaultValue,
+		'title': $form.find('.title input')[0].defaultValue,
+		'description': $form.find('.description input')[0].defaultValue,
+		'keywords': eval($form.find('.keywords input[type="hidden"]')[0].defaultValue).toString()
+	}
 
-		origFormInputs = {
-			'file-name': $form.find('.file-name input').val(),
-			'title': $form.find('.title input').val(),
-			'description': $form.find('.description input').val(),
-			'keywords': getKeywordChips($form)
-		}
-	});
+	var formInputs = {
+		'file-name': $form.find('.file-name input').val(),
+		'title': $form.find('.title input').val(),
+		'description': $form.find('.description input').val(),
+		'keywords': getKeywordChips($form)
+	}
+
+	var isDirty = false;
+	for (var key in formInputs) {
+	  if (formInputs.hasOwnProperty(key) && (origFormInputs[key] != formInputs[key])) {
+	    console.log('INPUT CHANGED: ---------\n' + key + " / " + origFormInputs[key] + " / " + formInputs[key]);
+	    isDirty = true;
+	  }
+	}
+
+	return isDirty;
+}
+
+function updateOriginalFormInputs($form) {
+	$form.find('.file-name input')[0].defaultValue = $form.find('.file-name input').val();
+	$form.find('.title input')[0].defaultValue = $form.find('.title input').val();
+	$form.find('.description input')[0].defaultValue = $form.find('.description input').val();
+	$form.find('.keywords input[type="hidden"]')[0].defaultValue = JSON.stringify(getKeywordChips($form));
+}
+
+function dirtyFormHandlers() {
 
 	$('.metadata-image').on('input', function() {
 
 		$form = $(this);
 
-		var origFormInputs = {
-			'file-name': $form.find('.file-name input')[0].defaultValue,
-			'title': $form.find('.title input')[0].defaultValue,
-			'description': $form.find('.description input')[0].defaultValue,
-			'keywords': eval($form.find('.keywords input[type="hidden"]')[0].defaultValue).toString()
+		if (isFormDirty($form)) {
+			$form.find('[type=submit]').removeClass('disabled');
+		} else {
+			$form.find('[type=submit]').addClass('disabled');
 		}
-
-		var formInputs = {
-			'file-name': $form.find('.file-name input').val(),
-			'title': $form.find('.title input').val(),
-			'description': $form.find('.description input').val(),
-			'keywords': getKeywordChips($form)
-		}
-
-		for (var key in formInputs) {
-		  if (formInputs.hasOwnProperty(key)) {
-		    console.log(key + " / " + origFormInputs[key] + " / " + formInputs[key]);
-		  }
-		}
-
 
 	});
+
+	$('.chips').on('chip.add chip.delete', function() {
+
+		$form = $(this).parents('.metadata-image');
+
+		if (isFormDirty($form)) {
+			$form.find('[type=submit]').removeClass('disabled');
+		} else {
+			$form.find('[type=submit]').addClass('disabled');
+		}
+
+	});
+}
+
+
+function configureSubmit() {
 
 	$('.metadata-image').submit(function(e) {
 
@@ -60,6 +84,8 @@ function configureSubmit() {
 				$form.animate({backgroundColor: 'white'}, 2000);
 				$form.removeClass('dirty');
 				$form.find('[type=submit]').addClass('disabled');
+
+				updateOriginalFormInputs($form);
 			}
 		});
 
@@ -98,6 +124,21 @@ function initKeywordChips() {
 			data: chips
 		});
 	});
+
+	$('.chips').click(function() {
+		$(this).find('.input')[0].style.setProperty('width', '120px', 'important');
+	});
+	$('.chips .input').focus(function() {
+		$(this)[0].style.setProperty('width', '120px', 'important');
+		$(this).parent().siblings('label').addClass('active');
+	});
+
+	$('.chips .input').blur(function() {
+	    $(this)[0].style.setProperty('width','0','important');
+	    if (!$(this).siblings('.chip').length) {
+	    	$(this).parent().siblings('label').removeClass('active');
+	    }
+	}).blur();
 }
 
 function getChipText(chip) {
