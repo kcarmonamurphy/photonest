@@ -11,7 +11,7 @@
 
 		<div class="selection-boundary">
 		    <a href="{{ entry.uri | urlencode }}" itemprop="contentUrl" data-size="{{entry.size}}">
-		        <img src="{{ entry.uri | urlencode }}?raw=1" itemprop="thumbnail" alt="{{entry.name}}" />
+		        <img src="{{ entry.uri | urlencode }}?thumbnail=1" itemprop="thumbnail" alt="{{entry.name}}" />
 		    </a>
 
 		    <figcaption itemprop="caption description">{{entry.name}}</figcaption>

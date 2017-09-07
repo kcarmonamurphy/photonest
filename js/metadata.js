@@ -39,9 +39,11 @@ function dirtyFormHandlers() {
 		$form = $(this);
 
 		if (isFormDirty($form)) {
-			$form.find('[type=submit]').removeClass('disabled');
+			$form.find('button[name="save"]').show();
+			$form.find('button[name="saved"]').hide();
 		} else {
-			$form.find('[type=submit]').addClass('disabled');
+			$form.find('button[name="save"]').hide();
+			$form.find('button[name="saved"]').show();
 		}
 
 	});
@@ -51,9 +53,11 @@ function dirtyFormHandlers() {
 		$form = $(this).parents('.metadata-image');
 
 		if (isFormDirty($form)) {
-			$form.find('[type=submit]').removeClass('disabled');
+			$form.find('button[name="save"]').show();
+			$form.find('button[name="saved"]').hide();
 		} else {
-			$form.find('[type=submit]').addClass('disabled');
+			$form.find('button[name="save"]').hide();
+			$form.find('button[name="saved"]').show();
 		}
 
 	});
@@ -83,7 +87,9 @@ function configureSubmit() {
 				$form.css({backgroundColor:'#b2ff59'});
 				$form.animate({backgroundColor: 'white'}, 2000);
 				$form.removeClass('dirty');
-				$form.find('[type=submit]').addClass('disabled');
+				
+				$form.find('button[name="save"]').hide();
+				$form.find('button[name="saved"]').show();
 
 				updateOriginalFormInputs($form);
 			}

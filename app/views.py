@@ -11,6 +11,41 @@ import json
 from modules.metadata import MetaData
 from modules.path_helper import *
 
+from subprocess import check_output
+
+def hasThumbnail(file):
+    
+    dir_path = os.path.dirname(file.path)
+
+    thumbnail_name = file.name + '_thumbnail_512'
+
+    thumbnail_path = os.path.join(dir_path, '.photonest', thumbnail_name)
+
+    # print(thumbnail_path)
+
+    try:
+        with open(thumbnail_path, "rb") as thumbnail:
+            return True
+    except IOError:
+        return False
+
+def generateThumbnail(file):
+
+    dir_path = os.path.dirname(file.path)
+
+    thumbnail_name = file.name + '_thumbnail_512'
+
+    thumbnail_path = os.path.join(dir_path, '.photonest', thumbnail_name)
+
+    print(file.path)
+    print(thumbnail_path)
+
+    try:
+        output = check_output(["convert", file.path, "-strip", "-resize", "512x512", thumbnail_path])
+        print(output)
+    except:
+        print("something went wrong")
+
 def _buildContext(dir_path, file_path=None):
 
     file_entries = []
@@ -30,6 +65,10 @@ def _buildContext(dir_path, file_path=None):
             dir_index+=1
 
         if not entry.name.startswith('.') and entry.is_file():
+
+            if not hasThumbnail(entry):
+                generateThumbnail(entry)
+
             md = MetaData(entry.path)
             mime_type = magic.from_file(entry.path, mime=True)
             mime_category = mime_type.split('/')
@@ -103,11 +142,28 @@ def raw(request, path):
     except IOError:
         raise Exception("issue opening image")
 
+def thumbnail(request, path):
+
+    thumbnail_512_path = path + "_thumbnail_512"
+
+    full_path = os.path.join(settings.GALLERY_DIR, '.photonest', thumbnail_512_path)
+
+    try:
+        with open(full_path, "rb") as file:
+            return HttpResponse(file.read(), content_type="image/jpeg")
+    except IOError:
+        return raw(request, path)
+
 
 def path(request, path):
 
+    # GET
     if request.GET.get('raw'):
         return raw(request, path)
+    if request.GET.get('thumbnail'):
+        return thumbnail(request, path)
+
+    # POST
     if request.GET.get('metadata'):
         return metadata(request, path)
 
