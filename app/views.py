@@ -13,38 +13,36 @@ from modules.path_helper import *
 
 from subprocess import check_output
 
-def hasThumbnail(file):
-    
-    dir_path = os.path.dirname(file.path)
-
-    thumbnail_name = file.name + '_thumbnail_512'
-
-    thumbnail_path = os.path.join(dir_path, '.photonest', thumbnail_name)
-
-    # print(thumbnail_path)
-
-    try:
-        with open(thumbnail_path, "rb") as thumbnail:
-            return True
-    except IOError:
-        return False
-
-def generateThumbnail(file):
+def generateThumbnailsIfNotPresent(file):
 
     dir_path = os.path.dirname(file.path)
 
-    thumbnail_name = file.name + '_thumbnail_512'
+    thumbnails_path = os.path.join(dir_path, '.photonest')
 
-    thumbnail_path = os.path.join(dir_path, '.photonest', thumbnail_name)
+    if not os.path.exists(thumbnails_path):
+        os.mkdir(thumbnails_path)
 
-    print(file.path)
-    print(thumbnail_path)
+    thumbnail_path_256 = os.path.join(
+        thumbnails_path, 
+        file.name + '_thumbnail_256'
+    )
 
-    try:
-        output = check_output(["convert", file.path, "-strip", "-resize", "512x512", thumbnail_path])
-        print(output)
-    except:
-        print("something went wrong")
+    thumbnail_path_512 = os.path.join(
+        thumbnails_path,
+        file.name + '_thumbnail_512'
+    )
+
+    if not os.path.isfile(thumbnail_path_256):
+        try:
+            check_output(["convert", file.path, "-strip", "-resize", "256x256", thumbnail_path_256])
+        except:
+            print("Error generating 256x256 thumbnail")
+
+    if not os.path.isfile(thumbnail_path_512):
+        try:
+            check_output(["convert", file.path, "-strip", "-resize", "512x512", thumbnail_path_512])
+        except:
+            print("Error generating 512x512 thumbnail")
 
 def _buildContext(dir_path, file_path=None):
 
@@ -66,8 +64,7 @@ def _buildContext(dir_path, file_path=None):
 
         if not entry.name.startswith('.') and entry.is_file():
 
-            if not hasThumbnail(entry):
-                generateThumbnail(entry)
+            generateThumbnailsIfNotPresent(entry)
 
             md = MetaData(entry.path)
             mime_type = magic.from_file(entry.path, mime=True)
@@ -144,12 +141,17 @@ def raw(request, path):
 
 def thumbnail(request, path):
 
-    thumbnail_512_path = path + "_thumbnail_512"
+    full_path = os.path.join(settings.GALLERY_DIR, path)
+    dir_path = os.path.dirname(full_path)
+    thumbnails_path = os.path.join(dir_path, '.photonest')
 
-    full_path = os.path.join(settings.GALLERY_DIR, '.photonest', thumbnail_512_path)
+    thumbnail_path_256 = os.path.join(
+        thumbnails_path, 
+        os.path.basename(path) + '_thumbnail_256'
+    )
 
     try:
-        with open(full_path, "rb") as file:
+        with open(thumbnail_path_256, "rb") as file:
             return HttpResponse(file.read(), content_type="image/jpeg")
     except IOError:
         return raw(request, path)
