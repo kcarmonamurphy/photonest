@@ -23,5 +23,5 @@ import re
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
-    url(r'^' + re.escape(settings.GALLERY_PREFIX) + '/(?P<path>.*)$', views.path, name='path'),
+    url(r'^' + re.escape(settings.GALLERY_PREFIX) + '/(?P<relative_path>.*)$', views.index, name='index'),
 ]
