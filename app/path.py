@@ -35,18 +35,6 @@ class Path():
                 os.path.basename(self._app_path) + '_thumbnail_256'
                 )
 
-        # if os.path.isdir(app_path):
-        #     return _folder(request, app_path)
-
-        # if os.path.isfile(app_path):
-        #     return _photo(request, app_path)
-
-
-    '''
-    Private Methods
-    ---------------
-    '''
-
     '''
     Public Methods
     ----------------

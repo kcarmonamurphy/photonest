@@ -11,6 +11,7 @@ import json
 from .metadata import MetaData
 from .path_helper import *
 from .thumbnails import *
+from .path import Path
 
 from subprocess import check_output
 
@@ -85,9 +86,7 @@ def metadata(request, path):
 
     data = json.loads(request.POST.get('data'))
 
-    full_path = os.path.join(settings.GALLERY_BASE_DIR, path)
-
-    md = MetaData(full_path)
+    md = MetaData(path.app)
 
     md.setTitle(data.get('title'))
     md.setDescription(data.get('description'))
@@ -100,69 +99,59 @@ def metadata(request, path):
 
 def raw(request, path):
 
-    full_path = os.path.join(settings.GALLERY_BASE_DIR, path)
-
     try:
-        with open(full_path, "rb") as file:
+        with open(path.app, "rb") as file:
             return HttpResponse(file.read(), content_type="image/jpeg")
     except IOError:
         raise Exception("issue opening image")
 
-def thumbnail(request, file_relative_path):
-
-    file_app_path = getAppPathFromRelativePath(file_relative_path)
-    dir_app_path = getDirAppPathFromFileAppPath(file_app_path)
-    dir_thumbnail_app_path = getThumbnailAppPathFromDirAppPath(dir_app_path)
-
-    thumbnail_path_256 = os.path.join(
-        dir_thumbnail_app_path, 
-        os.path.basename(file_relative_path) + '_thumbnail_256'
-    )
+def thumbnail(request, path):
 
     try:
-        with open(thumbnail_path_256, "rb") as file:
+        with open(path.thumbnail, "rb") as file:
             return HttpResponse(file.read(), content_type="image/jpeg")
     except IOError:
-        return raw(request, file_relative_path)
+        return raw(request, path)
 
 
 def index(request, relative_path):
 
-    # GET
+    path = Path(relative_path)
+
+    # GET ASSETS
     if request.GET.get('raw'):
-        return raw(request, relative_path)
+        return raw(request, path)
     if request.GET.get('thumbnail'):
-        return thumbnail(request, relative_path)
+        return thumbnail(request, path)
 
-    # POST
+    # MODIFY METADATA
     if request.GET.get('metadata'):
-        return metadata(request, relative_path)
+        return metadata(request, path)
 
-    try:
-        app_path = getAppPathFromRelativePath(relative_path)
-    except:
-        raise Exception('bad path')
+    # SHOW GALLERY
+    if os.path.isdir(path.app):
+        return _folder(request, path)
 
-    if os.path.isdir(app_path):
-        return _folder(request, app_path)
-
-    if os.path.isfile(app_path):
-        return _photo(request, app_path)
+    # SHOW IMAGE
+    if os.path.isfile(path.app):
+        return _photo(request, path)
 
     raise Http404("Haven't found shit")
 
 
-def _photo(request, file_app_path):
+def _photo(request, path):
 
-    dir_app_path = getDirAppPathFromFileAppPath(file_app_path)
+    dir_path = os.path.dirname(path.app)
 
-    context = _buildContext(dir_app_path, file_app_path)
+    context = _buildContext(dir_path, path.app)
 
     return render(request, 'main.html', context)
 
-def _folder(request, dir_app_path):
+def _folder(request, path):
 
-    context = _buildContext(dir_app_path)
+    print('folder')
+
+    context = _buildContext(path.app)
 
     return render(request, 'main.html', context)
 
