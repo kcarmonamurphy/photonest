@@ -24,6 +24,8 @@ uri: web resource to load mime type image
 from django.conf import settings
 import os
 
+#CREATE Path Class and have 4 or 8 properties
+
 
 def getGalleryPathFromAppPath(app_path):
 	""" Converts an app_path to a gallery_path
