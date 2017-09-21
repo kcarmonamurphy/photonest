@@ -129,11 +129,11 @@ def index(request, relative_path):
         return metadata(request, path)
 
     # SHOW GALLERY
-    if os.path.isdir(path.app):
+    if path.isdir():
         return _folder(request, path)
 
     # SHOW IMAGE
-    if os.path.isfile(path.app):
+    if path.isfile():
         return _photo(request, path)
 
     raise Http404("Haven't found shit")
@@ -141,9 +141,7 @@ def index(request, relative_path):
 
 def _photo(request, path):
 
-    dir_path = os.path.dirname(path.app)
-
-    context = _buildContext(dir_path, path.app)
+    context = _buildContext(path.app.dir, path.app.file)
 
     return render(request, 'main.html', context)
 
@@ -151,7 +149,7 @@ def _folder(request, path):
 
     print('folder')
 
-    context = _buildContext(path.app)
+    context = _buildContext(path.app.dir)
 
     return render(request, 'main.html', context)
 
