@@ -9,13 +9,12 @@ import magic
 import json
 
 from .metadata import MetaData
-from .path_helper import *
 from .thumbnails import *
 from .path import Path
 
 from subprocess import check_output
 
-def _buildContext(dir_path, file_path=None):
+def _buildContext(root_path):
 
     file_entries = []
     dir_entries = []
@@ -23,31 +22,34 @@ def _buildContext(dir_path, file_path=None):
     dir_index = 0
     image_index = None
 
-    for entry in os.scandir(dir_path):
+    for child in os.scandir(root_path.app.dir):
 
-        if not entry.name.startswith('.') and entry.is_dir():
+        child_path = Path(child.path, "app")
+
+        if not child.name.startswith('.') and child.is_dir():
+
             dir_entries.append({
-                'uri': getGalleryPathFromAppPath(entry.path),
-                'name': entry.name,
+                'uri': child_path.gallery.dir,
+                'name': child.name,
                 'index': dir_index
             })
             dir_index+=1
 
-        if not entry.name.startswith('.') and entry.is_file():
+        if not child.name.startswith('.') and child.is_file():
 
-            generateThumbnailsIfNotPresent(entry)
+            generateThumbnailsIfNotPresent(child)
 
-            md = MetaData(entry.path)
-            mime_type = magic.from_file(entry.path, mime=True)
+            md = MetaData(child_path.app.file)
+            mime_type = magic.from_file(child.path, mime=True)
             mime_category = mime_type.split('/')
             if mime_category[0] == 'image':
 
-                if file_path == entry.path:
+                if root_path.app.file == child_path.app.file:
                     image_index = file_index
 
                 file_entries.append({
-                    'uri': getGalleryPathFromAppPath(entry.path),
-                    'name': entry.name,
+                    'uri': child_path.gallery.file,
+                    'name': child.name,
                     'index': file_index,
                     'size': md.getImageSize(),
                     'metadata': _getMetadata(md)
@@ -57,7 +59,7 @@ def _buildContext(dir_path, file_path=None):
     context = {
         'file_entries': file_entries,
         'dir_entries': dir_entries,
-        'base_url': getGalleryPathFromAppPath(dir_path),
+        'base_url': root_path.gallery.dir,
         'image_index': image_index
     }
     
@@ -86,7 +88,7 @@ def metadata(request, path):
 
     data = json.loads(request.POST.get('data'))
 
-    md = MetaData(path.app)
+    md = MetaData(path.app.file)
 
     md.setTitle(data.get('title'))
     md.setDescription(data.get('description'))
@@ -100,7 +102,7 @@ def metadata(request, path):
 def raw(request, path):
 
     try:
-        with open(path.app, "rb") as file:
+        with open(path.app.file, "rb") as file:
             return HttpResponse(file.read(), content_type="image/jpeg")
     except IOError:
         raise Exception("issue opening image")
@@ -108,7 +110,7 @@ def raw(request, path):
 def thumbnail(request, path):
 
     try:
-        with open(path.thumbnail, "rb") as file:
+        with open(path.thumbnail.small, "rb") as file:
             return HttpResponse(file.read(), content_type="image/jpeg")
     except IOError:
         return raw(request, path)
@@ -128,28 +130,7 @@ def index(request, relative_path):
     if request.GET.get('metadata'):
         return metadata(request, path)
 
-    # SHOW GALLERY
-    if path.isdir():
-        return _folder(request, path)
-
-    # SHOW IMAGE
-    if path.isfile():
-        return _photo(request, path)
-
-    raise Http404("Haven't found shit")
-
-
-def _photo(request, path):
-
-    context = _buildContext(path.app.dir, path.app.file)
-
-    return render(request, 'main.html', context)
-
-def _folder(request, path):
-
-    print('folder')
-
-    context = _buildContext(path.app.dir)
+    context = _buildContext(path)
 
     return render(request, 'main.html', context)
 

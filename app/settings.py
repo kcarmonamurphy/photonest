@@ -10,7 +10,10 @@ GALLERY_BASE_DIR = os.path.join(BASE_DIR, "gallery")
 THUMBNAILS_FOLDER = ".photonest"
 
 # Array of Thumbnail Sizes in pixels
-THUMBNAIL_SIZES = [256, 512]
+THUMBNAIL_SIZES = {
+    'small': 256,
+    'medium': 512
+}
 
 
 # Quick-start development settings - unsuitable for production

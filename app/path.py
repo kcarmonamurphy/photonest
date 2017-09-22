@@ -1,3 +1,25 @@
+"""
+# path.app: path relative to the application
+# - /app/gallery/album/photo.jpg                                (path.app.file)
+# - /app/gallery/album/                                         (path.app.dir)
+
+# gallery_path: path including the gallery folder
+# - /gallery/album/photo.jpg                                    (path.gallery.file)
+# - /gallery/album/                                             (path.gallery.dir)
+
+# relative_path: passed into the view functions, path relative to gallery folder
+# - album/photo.jpg                                             (path.relative.file)
+# - album/                                                      (path.relative.dir)
+
+# thumbnail_app_path: for finding the thumbnail
+# - /app/gallery/album/.photonest/photo.jpg_thumbnail_256       (path.thumbnail.small)
+# - /app/gallery/album/.photonest/photo.jpg_thumbnail_512       (path.thumbnail.medium)
+# - /app/gallery/album/.photonest/                              (path.thumbnail.dir)
+
+# uri: web resource to load mime type image
+# - http://domain.com/gallery/album/photo.jpg?raw=1
+"""
+
 from django.conf import settings
 import os
 
@@ -15,31 +37,13 @@ class Path():
     def __init__(self, path, path_type='relative'):
 
         if path_type == 'relative':
-            self._relative_path = path
-
-            self._gallery_path = os.path.join(
-                '/',
-                settings.GALLERY_PREFIX,
-                self._relative_path
-                )
-
             self._app_path = os.path.join(
                 settings.GALLERY_BASE_DIR,
-                self._relative_path
+                path
                 )
 
         elif path_type == 'app':
-
             self._app_path = path
-
-            self._gallery_path = path[path.find('/' + settings.GALLERY_PREFIX):]
-
-        if os.path.basename(self._app_path):
-            self._thumbnail_path = os.path.join(
-                os.path.dirname(self._app_path), 
-                settings.THUMBNAILS_FOLDER,
-                os.path.basename(self._app_path) + '_thumbnail_256'
-                )
 
     '''
     Public Methods
@@ -59,17 +63,33 @@ class Path():
 
     @property
     def relative(self):
-        self._path = self._relative_path
+        self._path = os.path.relpath(self._app_path, settings.GALLERY_PREFIX)
         return self
 
     @property
     def gallery(self):
-        self._path = self._gallery_path
+        self._path = self._app_path[self._app_path.find('/' + settings.GALLERY_PREFIX):]
         return self
 
     @property
     def thumbnail(self):
-        return self._thumbnail_path
+        if self.isfile():
+            self._path = os.path.join(
+                os.path.dirname(self._app_path), 
+                settings.THUMBNAILS_FOLDER,
+                os.path.basename(self._app_path)
+                )
+            return self
+        else:
+            raise Exception('can\'t get thumbnail of folder')
+
+    @property
+    def small(self):
+        return self._path + '_thumbnail_' + str(settings.THUMBNAIL_SIZES['small'])
+
+    @property
+    def medium(self):
+        return self._path + '_thumbnail_' + str(settings.THUMBNAIL_SIZES['medium'])
 
     @property
     def file(self):
@@ -85,7 +105,12 @@ class Path():
             "property must be called on path.app,"
             "path.relative, or path.gallery"
             )
-        return os.path.dirname(self._path)
+        if self.isfile():
+            return os.path.dirname(self._path)
+        elif self.isdir():
+            return os.path.dirname(self._path + '/')
+        else:
+            raise Http404("Not a file nor a dir")
 
     @property
     def base(self):
