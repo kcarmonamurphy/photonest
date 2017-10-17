@@ -2,24 +2,49 @@
 
 html,
 body {
-  height: 100%;
-  margin: 0
+  	height: 100%;
+  	margin: 0
 }
 
 body {
-  display: flex;
-  flex-flow: column;
-  height: 100%;
+  	display: flex;
+  	flex-flow: column;
+  	height: 100%;
 }
 
 header {
-  flex: 0 1 auto;
+  	flex: 0 1 auto;
+}
+
+label, input {
+	color: #bbb;
+}
+
+label:disabled, input:disabled {
+	color: #ccc
+}
+
+figcaption {
+	color: #aaa;
+}
+
+.nav-wrapper {
+	background-color: @blue-grey;
+}
+
+.brand-logo img {
+	width:190px;
+	vertical-align: middle;
+
+	@media screen and (min-width: 992px) {
+		margin-left:20px;
+	}
 }
 
 main {
-  display: flex;
-  flex: 1 1 auto;
-  padding: 0;
+  	display: flex;
+  	flex: 1 1 auto;
+  	padding: 0;
 
 	> .row {
 		margin-bottom:0;
@@ -40,7 +65,7 @@ main {
 }
 
 #gallery {
-	background-color: @dark-grey;
+	background-color: @profound-grey;
 	padding:0;
 	height:100%;
 	overflow-y: scroll;
@@ -200,6 +225,8 @@ main {
 }
 
 .metadata {
+
+	background-color: @grey-lead;
 
 	.input-field input {
 		margin: 0 !important;

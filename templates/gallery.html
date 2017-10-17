@@ -1,10 +1,10 @@
 {% load staticfiles %}
 
-<div id="flex-container" class="flex-4">
+{% if image_index is not none %}
+	<span class="image-index">{{image_index}}</span>
+{% endif %}
 
-	{% if image_index is not none %}
-		<span class="image-index">{{image_index}}</span>
-	{% endif %}
+<div id="flex-container" class="flex-4">
 
 	{% for entry in file_entries %}
 	<figure class="gallery-image" id="g-i-{{entry.index}}" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
