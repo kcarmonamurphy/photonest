@@ -130,7 +130,7 @@ def index(request, relative_path):
     if request.GET.get('metadata'):
         return metadata(request, path)
 
-    context = _buildContext(path)
+    context = {} #_buildContext(path)
 
     return render(request, 'main.html', context)
 

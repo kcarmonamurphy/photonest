@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -83,6 +84,13 @@ DATABASES = {
         'HOST': 'db',
         'PORT': 3306,
     }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "ROUTING": "app.routing.channel_routing",
+    },
 }
 
 NOTEBOOK_ARGUMENTS = [

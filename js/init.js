@@ -31,6 +31,15 @@ $(document).ready(function() {
 
 	/// csrf
 	configureCSRF();
+
+
+
+	socket = new WebSocket("ws://" + window.location.host + window.location.pathname);
+	socket.onmessage = function(e) {
+	    console.log(JSON.parse(e.data));
+	}
+	// Call onopen directly if socket is already open
+	if (socket.readyState == WebSocket.OPEN) socket.onopen();
 	
 
 });
