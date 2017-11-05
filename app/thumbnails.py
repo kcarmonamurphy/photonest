@@ -2,7 +2,7 @@ import os
 from subprocess import check_output
 from .path import Path
 
-def generateThumbnailsIfNotPresent(file):
+def generate_thumbnails_if_missing(file):
 
     path = Path(file.path, 'app')
 

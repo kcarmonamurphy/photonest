@@ -35,11 +35,29 @@ $(document).ready(function() {
 
 
 	socket = new WebSocket("ws://" + window.location.host + window.location.pathname);
+	socket.onopen = function(e) {
+		socket.send('parse_path');
+	}
 	socket.onmessage = function(e) {
 	    console.log(JSON.parse(e.data));
+
+	    data = JSON.parse(e.data);
+
+	    $.ajax({
+			type: 'post',
+			url: data.uri + '?figure=1',
+			data: JSON.stringify(data),
+    		contentType: "application/json",
+			success: function(data) {
+				$('#gallery #flex-container').append(data);
+			},
+			error: function(xhr, status, error) {
+				console.log('something borked')
+			}
+		});
 	}
-	// Call onopen directly if socket is already open
-	if (socket.readyState == WebSocket.OPEN) socket.onopen();
+	// // Call onopen directly if socket is already open
+	// if (socket.readyState == WebSocket.OPEN) socket.onopen();
 	
 
 });

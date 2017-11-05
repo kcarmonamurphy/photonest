@@ -7,7 +7,13 @@
 
     <div class="col xl9 l8 m7 s12">
       <div id="gallery">
-        {% include 'gallery.html' %}
+
+        {% if image_index is not none %}
+          <span class="image-index">{{image_index}}</span>
+        {% endif %}
+
+        <div id="flex-container" class="flex-4"></div>
+        
       </div>
       <div id="photoswipe-container" class='closed'>
         {% include 'photoswipe.html' %}

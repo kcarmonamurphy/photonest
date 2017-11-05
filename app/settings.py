@@ -15,7 +15,6 @@ THUMBNAIL_SIZES = {
     'medium': 512
 }
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 

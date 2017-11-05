@@ -1,5 +1,5 @@
 from channels.routing import route
-from app.consumers import ws_add, ws_message, ws_disconnect
+from app.websockets import ws_add, ws_message, ws_disconnect
 
 from django.conf import settings
 
