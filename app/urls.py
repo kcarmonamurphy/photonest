@@ -24,4 +24,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
     url(r'^' + re.escape(settings.GALLERY_PREFIX) + '/(?P<relative_path>.*)$', views.index, name='index'),
+
+    url(r'^template/(?P<template>.*)$', views.template, name='template'),
 ]

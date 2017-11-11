@@ -21,18 +21,22 @@ def figure(request):
     context = dict(json.loads(request.body))
 
     if context.get('type') == 'image':
-        output = loader.render_to_string(
+        return HttpResponse(loader.render_to_string(
             'image.html',
             context
-        )
+        ))
 
     if context.get('type') == 'folder':
-        output = loader.render_to_string(
+        return HttpResponse(loader.render_to_string(
             'folder.html',
             context
-        )
+        ))
 
-    return HttpResponse(output)
+    if context.get('type') == 'index_image':
+        return HttpResponse(loader.render_to_string(
+            'image.html',
+            context
+        ))
 
 def metadata(request, path):
 
@@ -72,6 +76,9 @@ def index(request, relative_path):
     if request.GET.get('figure'):
         return figure(request)
 
+    if request.GET.get('item_template'):
+        return item_template(request)
+
     path = Path(relative_path)
 
     # GET ASSETS
@@ -85,4 +92,14 @@ def index(request, relative_path):
         return metadata(request, path)
 
     return render(request, 'main.html', {})
+
+def template(request, template):
+
+    if template == 'item':
+        print(HttpResponse(loader.render_to_string(
+            'item.html'
+        )))
+        return HttpResponse(loader.render_to_string(
+            'item.html'
+        ))
 

@@ -33,32 +33,53 @@ $(document).ready(function() {
 	configureCSRF();
 
 
+	itemTemplateXHR = $.get('/template/item');
 
-	socket = new WebSocket("ws://" + window.location.host + window.location.pathname);
-	socket.onopen = function(e) {
-		socket.send('parse_path');
-	}
-	socket.onmessage = function(e) {
-	    console.log(JSON.parse(e.data));
+	itemTemplateXHR.done((template) => {
 
-	    data = JSON.parse(e.data);
+		var options = {
+            valueNames: [
+            	'list-js-name',
+            	{ name: 'list-js-thumbnail-src', attr: 'src' }
+            ],
+            listClass: 'flex-container',
+            item: template
+        };
 
-	    $.ajax({
-			type: 'post',
-			url: data.uri + '?figure=1',
-			data: JSON.stringify(data),
-    		contentType: "application/json",
-			success: function(data) {
-				$('#gallery #flex-container').append(data);
-			},
-			error: function(xhr, status, error) {
-				console.log('something borked')
-			}
-		});
-	}
-	// // Call onopen directly if socket is already open
-	// if (socket.readyState == WebSocket.OPEN) socket.onopen();
-	
+        galleryList = new List('gallery', options);
+
+        $('#search-field').on('keyup', function() {
+            var searchString = $(this).val();
+            galleryList.search(searchString);
+        });
+
+
+        //socket stuff dawg
+        socket = new WebSocket("ws://" + window.location.host + window.location.pathname);
+        socket.onopen = function(e) {
+            socket.send('parse_path');
+        }
+        socket.onmessage = function(e) {
+            console.log(JSON.parse(e.data));
+
+            data = JSON.parse(e.data);
+
+            if (data.type == 'image') {
+                galleryList.add({
+                  'list-js-name': data.name,
+                  'list-js-thumbnail-src': data.uri + '?thumbnail=1'
+                });
+            } else if (data.type == 'folder') {
+                galleryList.add({
+                  'list-js-name': data.name,
+                  'list-js-thumbnail-src': '/static/images/folder.png'
+                });
+            }
+
+
+        }
+
+	});
 
 });
 
