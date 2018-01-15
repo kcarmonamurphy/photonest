@@ -5,3 +5,6 @@ django-extensions
 jupyter
 python-magic
 channels
+djangorestframework
+markdown
+django-filter

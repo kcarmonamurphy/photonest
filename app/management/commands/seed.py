@@ -2,12 +2,28 @@ import os
 import magic
 import json
 
-from .metadata import MetaData
-from .path import Path
+from app.metadata import MetaData
+from app.path import Path
 
-from .thumbnails import generate_thumbnails_if_missing
+from app.thumbnails import generate_thumbnails_if_missing
 
-def parse_path(path, message):
+from app.models import Folder, Image
+
+from django.core.management.base import BaseCommand
+
+class Command(BaseCommand):
+
+    def handle(self, *args, **options):
+
+        parse_path(Path('trip'))
+
+def parse_path(path):
+
+    parent = Folder(
+        uri=path.relative.dir,
+        name='root'
+    )
+    parent.save()
     
     # if url specifies an image, send that data to browser
     # right away, so that photoswipe can load it while
@@ -15,16 +31,15 @@ def parse_path(path, message):
     if path.isfile() and mimetype_is_image(path.app.file):
 
         md = MetaData(path.app.file)
-        message.reply_channel.send({
-            "text": json.dumps({
-                'type': 'image',
-                'uri': path.gallery.file,
-                'name': os.path.basename(path.app.file),
-                'active': True,
-                'size': md.getImageSize(),
-                'metadata': get_metadata(md)
-            })
-        }, immediately=True)
+        image = Image(
+            uri=path.relative.file,
+            name=os.path.basename(path.app.file),
+            size=md.getImageSize(),
+            title=md.getTitle(),
+            description=md.getDescription(),
+            parent=parent
+        )
+        image.save()
 
     # scan the directory specified in the path for all photos
     # and folders, send this info to browser via websockets
@@ -34,30 +49,27 @@ def parse_path(path, message):
 
         if not child.name.startswith('.') and child.is_dir():
 
-            message.reply_channel.send({
-                "text": json.dumps({
-                    'type': 'folder',
-                    'uri': child_path.gallery.dir,
-                    'name': child.name,
-                    'active': False,
-                })
-            }, immediately=True)
+            folder = Folder(
+                uri=child_path.relative.dir,
+                name=child.name,
+                parent=parent
+            )
+            folder.save()
 
         if not child.name.startswith('.') and child.is_file() and mimetype_is_image(child.path):
 
             md = MetaData(child_path.app.file)
             generate_thumbnails_if_missing(child)
 
-            message.reply_channel.send({
-                "text": json.dumps({
-                    'type': 'image',
-                    'uri': child_path.gallery.file,
-                    'name': child.name,
-                    'size': md.getImageSize(),
-                    # 'active': False,
-                    'metadata': get_metadata(md)
-                })
-            }, immediately=True)
+            image = Image(
+                uri=child_path.relative.file,
+                name=child.name,
+                size=md.getImageSize(),
+                title=md.getTitle(),
+                description=md.getDescription(),
+                parent=parent
+            )
+            image.save()
 
 def mimetype_is_image(path):
     '''

@@ -1,3 +1,5 @@
+// 'use strict'
+
 $(document).ready(function() {
 
 	// define global jQuery objects
@@ -40,7 +42,12 @@ $(document).ready(function() {
 		var options = {
             valueNames: [
             	'list-js-name',
-            	{ name: 'list-js-thumbnail-src', attr: 'src' }
+                'list-js-title',
+                'list-js-description',
+                'list-js-create-date',
+            	{ name: 'list-js-thumbnail-src', attr: 'src' },
+                { name: 'list-js-figure-type', attr: 'data-figure-type' },
+                { name: 'list-js-href', attr: 'href' }
             ],
             listClass: 'flex-container',
             item: template
@@ -56,6 +63,7 @@ $(document).ready(function() {
 
         //socket stuff dawg
         socket = new WebSocket("ws://" + window.location.host + window.location.pathname);
+        console.log(socket);
         socket.onopen = function(e) {
             socket.send('parse_path');
         }
@@ -66,15 +74,24 @@ $(document).ready(function() {
 
             if (data.type == 'image') {
                 galleryList.add({
-                  'list-js-name': data.name,
-                  'list-js-thumbnail-src': data.uri + '?thumbnail=1'
+                    'list-js-name': data.name,
+                    'list-js-href': data.uri,
+                    'list-js-thumbnail-src': data.uri + '?thumbnail=1',
+                    'list-js-figure-type': 'image',
+                    'list-js-title': data.metadata.Title,
+                    'list-js-description': data.metadata.Description,
+                    'list-js-create-date': data.metadata.read_only["Create Date"]
                 });
             } else if (data.type == 'folder') {
                 galleryList.add({
-                  'list-js-name': data.name,
-                  'list-js-thumbnail-src': '/static/images/folder.png'
+                    'list-js-name': data.name,
+                    'list-js-href': data.uri,
+                    'list-js-thumbnail-src': '/static/images/folder.png',
+                    'list-js-figure-type': 'folder'
                 });
             }
+
+            galleryList.sort('list-js-create-date', { order: "asc" });
 
 
         }

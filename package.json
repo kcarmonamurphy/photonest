@@ -5,9 +5,9 @@
   "main": "manage.py",
   "dependencies": {
     "js-cookie": "^2.1.4",
+    "list.js": "^1.5.0",
     "materialize-css": "^0.99.0",
-    "photoswipe": "^4.1.2",
-    "list.js": "^1.5.0"
+    "photoswipe": "^4.1.2"
   },
   "devDependencies": {
     "browser-sync": "^2.18.12",
