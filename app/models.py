@@ -9,7 +9,10 @@ class Record(models.Model):
         return self.uri
 
     def save(self, *args, **kwargs):
-        self.uri = self.parent.uri + '/' + self.name
+        # if (self.parent is None):
+        #     self.uri = self.name
+        # else:
+        #     self.uri = self.parent.uri + '/' + self.name
         # if succeeds saving to file system, call save method
         super().save(*args, **kwargs)
 
@@ -39,8 +42,6 @@ class Image(Record):
 
 
 def your_receiver_function(sender, instance, *args, **kwargs):
-    print("HELLO THERE")
-    if instance.name and not instance.uri:
-               instance.slug = slugify(instance.title)
+    print("saving an image")
 
 pre_save.connect(your_receiver_function, sender=Image)

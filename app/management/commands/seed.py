@@ -15,25 +15,22 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        parse_path(Path('trip'))
+        parse_path(Path('desk'))
 
 def parse_path(path):
 
-    parent = Folder(
-        uri=path.relative.dir,
-        name='root'
+    parent, _ = Folder.objects.get_or_create(
+        uri=path.gallery.dir,
+        name=path.gallery.base
     )
     parent.save()
     
-    # if url specifies an image, send that data to browser
-    # right away, so that photoswipe can load it while
-    # the rest of the directory loads
     if path.isfile() and mimetype_is_image(path.app.file):
 
         md = MetaData(path.app.file)
         image = Image(
-            uri=path.relative.file,
-            name=os.path.basename(path.app.file),
+            uri=path.gallery.file,
+            name=path.gallery.base,
             size=md.getImageSize(),
             title=md.getTitle(),
             description=md.getDescription(),
@@ -50,7 +47,7 @@ def parse_path(path):
         if not child.name.startswith('.') and child.is_dir():
 
             folder = Folder(
-                uri=child_path.relative.dir,
+                uri=child_path.gallery.dir,
                 name=child.name,
                 parent=parent
             )
@@ -62,7 +59,7 @@ def parse_path(path):
             generate_thumbnails_if_missing(child)
 
             image = Image(
-                uri=child_path.relative.file,
+                uri=child_path.gallery.file,
                 name=child.name,
                 size=md.getImageSize(),
                 title=md.getTitle(),

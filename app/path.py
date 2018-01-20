@@ -57,6 +57,9 @@ class Path():
     def isdir(self):
         return os.path.isdir(self._app_path)
 
+    def isrootdir(self):
+        return os.path.samefile(self._app_path, settings.GALLERY_BASE_DIR)
+
     @property
     def app(self):
         self._path = self._app_path
@@ -120,5 +123,7 @@ class Path():
             "path.relative, or path.gallery"
             )
         return os.path.basename(self._path)
+
+
 
  
