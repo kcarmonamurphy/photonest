@@ -1,6 +1,8 @@
 import os
 import magic
 import json
+from datetime import datetime
+import pytz
 
 from app.metadata import MetaData
 from app.path import Path
@@ -10,18 +12,20 @@ from app.thumbnails import generate_thumbnails_if_missing
 from app.models import Folder, Image
 
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        parse_path(Path('desk'))
+        parse_path(Path(''))
 
 def parse_path(path):
 
+    print("PARSE_PATH ****", path.gallery.dir, path.gallery.base)
+
     parent, _ = Folder.objects.get_or_create(
-        uri=path.gallery.dir,
-        name=path.gallery.base
+        uri=path.gallery.dir
     )
     parent.save()
     
@@ -34,39 +38,50 @@ def parse_path(path):
             size=md.getImageSize(),
             title=md.getTitle(),
             description=md.getDescription(),
+            last_modified=get_last_modified_datetime(path.app.file),
             parent=parent
         )
         image.save()
 
-    # scan the directory specified in the path for all photos
-    # and folders, send this info to browser via websockets
-    for child in os.scandir(path.app.dir):
+    elif path.isdir():
 
-        child_path = Path(child.path, "app")
+        # scan the directory specified in the path for all photos
+        # and folders, send this info to browser via websockets
+        for child in os.scandir(path.app.dir):
 
-        if not child.name.startswith('.') and child.is_dir():
+            child_path = Path(child.path, "app")
 
-            folder = Folder(
-                uri=child_path.gallery.dir,
-                name=child.name,
-                parent=parent
-            )
-            folder.save()
+            if not child.name.startswith('.') and child.is_dir():
 
-        if not child.name.startswith('.') and child.is_file() and mimetype_is_image(child.path):
+                folder = Folder(
+                    uri=child_path.gallery.dir,
+                    name=child.name,
+                    parent=parent
+                )
+                folder.save()
 
-            md = MetaData(child_path.app.file)
-            generate_thumbnails_if_missing(child)
+            if not child.name.startswith('.') and child.is_file() and mimetype_is_image(child.path):
 
-            image = Image(
-                uri=child_path.gallery.file,
-                name=child.name,
-                size=md.getImageSize(),
-                title=md.getTitle(),
-                description=md.getDescription(),
-                parent=parent
-            )
-            image.save()
+                md = MetaData(child_path.app.file)
+                generate_thumbnails_if_missing(child)
+
+                image = Image(
+                    uri=child_path.gallery.file,
+                    name=child.name,
+                    size=md.getImageSize(),
+                    title=md.getTitle(),
+                    description=md.getDescription(),
+                    last_modified=get_last_modified_datetime(child_path.app.file),
+                    parent=parent
+                )
+                image.save()
+
+                print(os.path.getmtime(path.app.file))
+
+def get_last_modified_datetime(path):
+    epoch_time = os.path.getmtime(path)
+    date_time = datetime.utcfromtimestamp(epoch_time)
+    return timezone.make_aware(date_time, timezone=pytz.UTC)
 
 def mimetype_is_image(path):
     '''

@@ -9,10 +9,6 @@ class Record(models.Model):
         return self.uri
 
     def save(self, *args, **kwargs):
-        # if (self.parent is None):
-        #     self.uri = self.name
-        # else:
-        #     self.uri = self.parent.uri + '/' + self.name
         # if succeeds saving to file system, call save method
         super().save(*args, **kwargs)
 
@@ -35,6 +31,8 @@ class Image(Record):
         on_delete=models.CASCADE,
         related_name='images',
     )
+
+    last_modified = models.DateTimeField(null=True, blank=True)
 
     title = models.TextField(null=True, blank=True)
     size = models.TextField(null=True, blank=True)

@@ -41,7 +41,13 @@ class Path():
             self._app_path = os.path.join(
                 settings.GALLERY_BASE_DIR,
                 path
-                )
+            )
+
+        elif path_type == 'gallery':
+            self._app_path = os.path.join(
+                settings.BASE_DIR,
+                path
+            )
 
         elif path_type == 'app':
             self._app_path = path
@@ -109,6 +115,7 @@ class Path():
             "property must be called on path.app,"
             "path.relative, or path.gallery"
             )
+        # return os.path.dirname(self._path)
         if self.isfile():
             return os.path.dirname(self._path)
         elif self.isdir():
@@ -122,7 +129,13 @@ class Path():
             "property must be called on path.app,"
             "path.relative, or path.gallery"
             )
-        return os.path.basename(self._path)
+        # return os.path.basename(self._path)
+        if self.isfile():
+            return os.path.basename(self._path)
+        elif self.isdir():
+            return os.path.basename(self._path + '/')
+        else:
+            raise Http404("Not a file nor a dir")
 
 
 
