@@ -1,25 +1,10 @@
 version: '2'
 
 services:
-  db:
-    image: mysql
-    volumes:
-      - db_data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: nest
-      MYSQL_DATABASE: dev
-    ports:
-      - "3306:3306"
-    restart: always
   web:
     build: .
     command: /usr/bin/supervisord -c supervisord.conf
     volumes:
       - .:/app
     ports:
-      - "8080:8080"
       - "4567:4567"
-    depends_on:
-      - db
-volumes:
-  db_data:
