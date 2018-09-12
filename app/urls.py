@@ -27,12 +27,9 @@ router.register(r'images', views.ImageViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-
-    url(r'^' + re.escape(settings.GALLERY_PREFIX) + '/(?P<relative_path>.*)$', views.index, name='index'),
-
-    url(r'^template/(?P<template>.*)$', views.template, name='template'),
-
     url(r'^', include(router.urls)),
 
+    # url(r'^' + re.escape(settings.GALLERY_PREFIX) + '/(?P<relative_path>.*)$', views.index, name='index'),
+    # url(r'^template/(?P<template>.*)$', views.template, name='template'),
     # url(r'^api/(?P<relative_path>.*)$', )
 ]
