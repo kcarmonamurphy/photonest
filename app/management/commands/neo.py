@@ -17,12 +17,8 @@ from neo4j import GraphDatabase
 
 class Command(BaseCommand):
 
-    driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password"))
+    driver = GraphDatabase.driver("bolt://db:7687")
 
     def handle(self, *args, **options):
-
-        create_node()
-
-    def create_node():
 
         pass

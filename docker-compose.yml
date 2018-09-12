@@ -1,10 +1,27 @@
 version: '2'
 
 services:
+  db:
+    image: neo4j:3.4
+    volumes:
+      - db_data:$HOME/neo4j/data
+      - logs:$HOME/neo4j/logs
+    environment:
+      NEO4J_AUTH: none
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    restart: always
   web:
     build: .
     command: /usr/bin/supervisord -c supervisord.conf
     volumes:
       - .:/app
     ports:
+      - "8080:8080"
       - "4567:4567"
+    depends_on:
+      - db
+volumes:
+  db_data:
+  logs:
