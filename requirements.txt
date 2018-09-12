@@ -4,3 +4,4 @@ django-extensions
 jupyter
 python-magic
 channels
+neo4j
