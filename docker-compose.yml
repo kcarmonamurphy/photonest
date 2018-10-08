@@ -6,8 +6,9 @@ services:
     volumes:
       - db_data:$HOME/neo4j/data
       - logs:$HOME/neo4j/logs
+      - ./neo4jplugins:/plugins
     environment:
-      NEO4J_AUTH: none
+      NEO4J_AUTH: "neo4j/password"
     ports:
       - "7474:7474"
       - "7687:7687"

@@ -6,7 +6,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        driver = GraphDatabase.driver("bolt://db:7687")
+        driver = GraphDatabase.driver("bolt://db:7687", auth=("neo4j", "password"))
 
         with driver.session() as session:
             session.write_transaction(delete_nodes)

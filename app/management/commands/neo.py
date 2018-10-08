@@ -18,7 +18,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        parse_path(Path('albums'))
+        parse_path(Path(options['path']))
+
+    def add_arguments(self, parser):
+
+        parser.add_argument('path', type=str)
 
 def mimetype_is_image(path):
     '''
@@ -39,7 +43,7 @@ def parse_path(path):
 
     print("PARSE_PATH ****", path.gallery.dir, path.gallery.base)
 
-    driver = GraphDatabase.driver("bolt://db:7687")
+    driver = GraphDatabase.driver("bolt://db:7687", auth=("neo4j", "password"))
 
     with driver.session() as session:
 
@@ -58,6 +62,16 @@ def parse_path(path):
 
         elif path.isdir():
 
+            # collect current list of child uris
+            results = session.read_transaction(get_resources,
+                parent_uri=path.gallery.dir
+            )
+
+            resources = []
+            resources2 = []
+            for resource in results:
+              resources.append(resource["child.uri"])
+
             # scan the directory specified in the path for all photos
             # and folders, send this info to browser via websockets
             for child in os.scandir(path.app.dir):
@@ -71,6 +85,7 @@ def parse_path(path):
                         name=child.name,
                         parent_uri=path.gallery.dir
                     )
+                    resources2.append(child_path.gallery.dir)
 
                 if not child.name.startswith('.') and child.is_file() and mimetype_is_image(child.path):
 
@@ -84,17 +99,56 @@ def parse_path(path):
                         title=md.getTitle(),
                         description=md.getDescription(),
                         last_modified=get_last_modified_datetime(child_path.app.file),
-                        parent_uri=child_path.gallery.dir
+                        parent_uri=path.gallery.dir
                     )
+                    resources2.append(child_path.gallery.file)
+
+            # print(resources)
+            # print(resources2)
+            items_to_delete = set(resources) - set(resources2)
+            for uri in items_to_delete:
+                session.write_transaction(delete_nodes_and_descendants,
+                    uri=uri
+                )
+
+def delete_nodes_and_descendants(tx, uri):
+    tx.run(
+        f"""
+            MATCH (node {{ uri: "{uri}" }})
+            DETACH DELETE node
+        """
+    )
+
+def get_resources(tx, parent_uri):
+    return tx.run(
+        f"""
+            MATCH (folder:Folder {{ uri: "{parent_uri}" }})-[:CONTAINS]->(child)
+            RETURN child.uri
+        """
+    )
 
 def add_image(tx, uri, name, size, title, description, last_modified, parent_uri):
     print(uri, name, size, title, description, last_modified, parent_uri)
-    tx.run("MERGE (folder:Folder {uri: $parent_uri})"
-        "MERGE (folder)-[:CONTAINS]->(image:Image {uri: $uri})",
-        uri=uri, parent_uri=parent_uri)
+    tx.run(
+        f"""
+            MERGE (folder:Folder {{ uri: "{parent_uri}" }})
+            MERGE (folder)-[:CONTAINS]->(image:Image {{ uri: "{uri}" }})
+        """
+    )
 
 def add_folder(tx, uri, name, parent_uri):
     print(uri, name, parent_uri)
-    tx.run("MERGE (folder:Folder {uri: $parent_uri})"
-        "MERGE (folder)-[:CONTAINS]->(childfolder:Folder {uri: $uri})",
-        uri=uri, parent_uri=parent_uri)
+    tx.run(
+        f"""
+            MERGE (folder:Folder {{ uri: "{parent_uri}" }})
+            MERGE (folder)-[:CONTAINS]->(childfolder:Folder {{ uri: "{uri}" }})
+        """
+    )
+    tx.run(
+        f"""
+            MATCH (folder:Folder {{ uri: "{uri}" }}) 
+            WITH collect(folder) AS folders
+            CALL apoc.refactor.mergeNodes(folders) YIELD node
+            RETURN *
+        """
+    )
