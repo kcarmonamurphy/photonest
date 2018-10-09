@@ -124,6 +124,14 @@ class Path():
             raise Http404("Not a file nor a dir")
 
     @property
+    def parent(self):
+        assert self._path is not None, (
+            "property must be called on path.app,"
+            "path.relative, or path.gallery"
+            )
+        return os.path.abspath(os.path.join(self._path, os.path.pardir))
+
+    @property
     def base(self):
         assert self._path is not None, (
             "property must be called on path.app,"
