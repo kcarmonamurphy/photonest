@@ -24,6 +24,14 @@ from django.conf import settings
 from django.http import Http404
 import os
 
+from pathlib import Path as ConcretePath
+from pathlib import PurePath
+
+'''
+PurePath.name
+PurePath.parent
+'''
+
 class Path():
     """
     Module for representing the different paths that are
@@ -35,71 +43,37 @@ class Path():
     -----------------------
     '''
 
-    def __init__(self, path, path_type='relative'):
-
-        if path_type == 'relative':
-            self._app_path = os.path.join(
-                settings.GALLERY_BASE_DIR,
-                path
-            )
-
-        elif path_type == 'gallery':
-            self._app_path = os.path.join(
-                settings.BASE_DIR,
-                path
-            )
-
-        elif path_type == 'app':
-            self._app_path = path
+    def __init__(self, path):
+        self._path = PurePath(path)
+        self._app_path = ConcretePath(settings.GALLERY_BASE_DIR).joinpath(path)
 
     '''
     Public Methods
     ----------------
     '''
 
-    def isfile(self):
-        return os.path.isfile(self._app_path)
+    def is_file(self):
+        return self._app_path.is_file()
 
-    def isdir(self):
-        return os.path.isdir(self._app_path)
-
-    def isrootdir(self):
-        return os.path.samefile(self._app_path, settings.GALLERY_BASE_DIR)
+    def is_dir(self):
+        return self._app_path.is_dir()
 
     @property
-    def app(self):
-        self._path = self._app_path
-        return self
+    def name(self):
+        return self._path.name
 
     @property
-    def relative(self):
-        self._path = os.path.relpath(self._app_path, settings.GALLERY_PREFIX)
-        return self
+    def parent(self):
+        return self._path.parent
 
-    @property
-    def gallery(self):
-        self._path = self._app_path[self._app_path.find('/' + settings.GALLERY_PREFIX):]
-        return self
-
-    @property
-    def thumbnail(self):
-        if self.isfile():
-            self._path = os.path.join(
-                os.path.dirname(self._app_path), 
-                settings.THUMBNAILS_FOLDER,
-                os.path.basename(self._app_path)
-                )
-            return self
-        else:
+    def thumbnail(self, size="small"):
+        if not self.is_file():
             raise Exception('can\'t get thumbnail of folder')
 
-    @property
-    def small(self):
-        return self._path + '_thumbnail_' + str(settings.THUMBNAIL_SIZES['small'])
-
-    @property
-    def medium(self):
-        return self._path + '_thumbnail_' + str(settings.THUMBNAIL_SIZES['medium'])
+        thumbnail_filename = self.name + settings.THUMBNAIL_PREFIX + str(settings.THUMBNAIL_SIZES[size])
+        
+        return self.parent.joinpath(
+            settings.THUMBNAILS_FOLDER, thumbnail_filename)   
 
     @property
     def file(self):
@@ -123,13 +97,13 @@ class Path():
         else:
             raise Http404("Not a file nor a dir")
 
-    @property
-    def parent(self):
-        assert self._path is not None, (
-            "property must be called on path.app,"
-            "path.relative, or path.gallery"
-            )
-        return os.path.abspath(os.path.join(self._path, os.path.pardir))
+    # @property
+    # def parent(self):
+    #     assert self._path is not None, (
+    #         "property must be called on path.app,"
+    #         "path.relative, or path.gallery"
+    #         )
+    #     return os.path.abspath(os.path.join(self._path, os.path.pardir))
 
     @property
     def base(self):

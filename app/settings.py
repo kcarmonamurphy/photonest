@@ -5,9 +5,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Path for Photo Library
 GALLERY_PREFIX = "gallery"
-GALLERY_BASE_DIR = os.path.join(BASE_DIR, "gallery")
+GALLERY_BASE_DIR = os.path.join(BASE_DIR, GALLERY_PREFIX)
 
 THUMBNAILS_FOLDER = ".photonest"
+THUMBNAIL_PREFIX = "_thumbnail_"
 
 # Array of Thumbnail Sizes in pixels
 THUMBNAIL_SIZES = {
