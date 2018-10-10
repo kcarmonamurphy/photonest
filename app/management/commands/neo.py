@@ -6,7 +6,9 @@ import pytz
 from django.utils import timezone
 
 from app.metadata import MetaData
-from app.path import Path
+from app.path import GalleryPath
+
+from django.conf import settings
 
 from app.thumbnails import generate_thumbnails_if_missing
 
@@ -17,13 +19,15 @@ from neo4j.util import watch
 import logging
 from sys import stdout
 
+from pathlib import PurePath
+
 # watch("neo4j.bolt", logging.DEBUG, stdout)
 
 class Command(BaseCommand):
 
   def handle(self, *args, **options):
 
-    parse_path(Path(options['path']))
+    parse_path( GalleryPath(options['path']) )
 
   def add_arguments(self, parser):
 
@@ -31,94 +35,113 @@ class Command(BaseCommand):
 
 def mimetype_is_image(path):
   '''
-  Accepts a vlue of os.DirEntry
+  Accepts a path string value
   '''
-  mime_type = magic.from_file(path, mime=True)
+  mime_type = magic.from_file(str(path), mime=True)
   mime_category = mime_type.split('/')
   if mime_category[0] == 'image':
     return True
   return False
 
 def get_last_modified_datetime(path):
+  '''
+  Accepts a PurePath value
+  '''
   epoch_time = os.path.getmtime(path)
   date_time = datetime.utcfromtimestamp(epoch_time)
   return timezone.make_aware(date_time, timezone=pytz.UTC)
 
 def parse_path(path):
-
-  print("PARSE_PATH ****", path.gallery.dir, path.gallery.base)
+  '''
+  Accepts a GalleryPath value
+  '''
+  print("PARSE_PATH ****", str(path.parent), path.name)
 
   driver = GraphDatabase.driver("bolt://db:7687", auth=("neo4j", "password"))
 
   with driver.session() as session:
 
-    if path.isfile() and mimetype_is_image(path.app.file):
+    if path.is_file() and mimetype_is_image(path.app):
 
-      md = MetaData(path.app.file)
+      md = MetaData(path.app)
       session.write_transaction(add_image,
-        uri=path.gallery.file,
-        name=path.gallery.base,
+        uri=str(path.gallery),
+        name=path.name,
         size=md.getImageSize(),
         title=md.getTitle(),
         description=md.getDescription(),
-        last_modified=get_last_modified_datetime(path.app.file),
-        parent_uri=path.gallery.dir
+        last_modified=get_last_modified_datetime(path.app),
+        parent_uri=str(path.parent)
       )
 
-    elif path.isdir():
+    elif path.is_dir():
 
-      node_id = session.write_transaction(add_folder,
-        uri=path.gallery.dir,
-        name="",
-        parent_uri=path.gallery.parent
+      session.write_transaction(add_folder,
+        uri=str(path.gallery),
+        name=path.name,
+        parent_uri=str(path.parent)
       )
 
-      # collect current list of child uris
-      results = session.read_transaction(get_resources,
-        parent_uri=path.gallery.dir
+      parse_dir(path)
+
+
+def parse_dir(path):
+
+  driver = GraphDatabase.driver("bolt://db:7687", auth=("neo4j", "password"))
+
+  with driver.session() as session:
+
+    # collect current list of child uris
+    results = session.read_transaction(get_resources,
+      uri=str(path.gallery)
+    )
+
+    resources, resources2 = set(), set()
+    for resource in results:
+      resources.add(resource["child.uri"])
+    resources.discard('.')
+
+    # scan the directory specified in the path for all photos
+    # and folders, send this info to browser via websockets
+    for child in os.scandir(path.app):
+
+      cpath = GalleryPath(
+        PurePath(child.path).relative_to(settings.GALLERY_BASE_DIR)
       )
 
-      resources = []
-      resources2 = []
-      for resource in results:
-        resources.append(resource["child.uri"])
+      if not cpath.name.startswith('.') and cpath.is_dir():
 
-      # scan the directory specified in the path for all photos
-      # and folders, send this info to browser via websockets
-      for child in os.scandir(path.app.dir):
-
-        child_path = Path(child.path, "app")
-
-        if not child.name.startswith('.') and child.is_dir():
-
-          session.write_transaction(add_folder,
-            uri=child_path.gallery.dir,
-            name=child.name,
-            parent_uri=path.gallery.dir
-          )
-          resources2.append(child_path.gallery.dir)
-
-        if not child.name.startswith('.') and child.is_file() and mimetype_is_image(child.path):
-
-          md = MetaData(child_path.app.file)
-          # generate_thumbnails_if_missing(child)
-
-          session.write_transaction(add_image,
-            uri=child_path.gallery.file,
-            name=child.name,
-            size=md.getImageSize(),
-            title=md.getTitle(),
-            description=md.getDescription(),
-            last_modified=get_last_modified_datetime(child_path.app.file),
-            parent_uri=path.gallery.dir
-          )
-          resources2.append(child_path.gallery.file)
-          
-      items_to_delete = set(resources) - set(resources2)
-      for uri in items_to_delete:
-        session.write_transaction(delete_nodes_and_descendants,
-          uri=uri
+        session.write_transaction(add_folder,
+          uri=str(cpath.gallery),
+          name=cpath.name,
+          parent_uri=str(cpath.parent)
         )
+        resources2.add(str(cpath.gallery))
+
+      if not cpath.name.startswith('.') and cpath.is_file() and mimetype_is_image(cpath.app):
+
+        md = MetaData(cpath.app)
+        generate_thumbnails_if_missing(cpath)
+
+        session.write_transaction(add_image,
+          uri=str(cpath.gallery),
+          name=cpath.name,
+          size=md.getImageSize(),
+          title=md.getTitle(),
+          description=md.getDescription(),
+          last_modified=get_last_modified_datetime(cpath.app),
+          parent_uri=str(cpath.parent)
+        )
+        resources2.add(str(cpath.gallery))
+        
+    items_to_delete = resources - resources2
+    # print("resources", resources)
+    # print("resources2", resources2)
+    print(items_to_delete)
+    for uri in items_to_delete:
+      session.write_transaction(delete_nodes_and_descendants,
+        uri=uri
+      )
 
 def delete_nodes_and_descendants(tx, uri):
   print(" --- deleting node and children ---- ", uri)
@@ -130,10 +153,10 @@ def delete_nodes_and_descendants(tx, uri):
     """
   )
 
-def get_resources(tx, parent_uri):
+def get_resources(tx, uri):
   return tx.run(
     f"""
-      MATCH (folder:Folder {{ uri: "{parent_uri}" }})-[:CONTAINS]->(child)
+      MATCH (folder:Folder {{ uri: "{uri}" }})-[:CONTAINS]->(child)
       RETURN child.uri
     """
   )
