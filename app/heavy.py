@@ -19,24 +19,9 @@ from sys import stdout
 
 from pathlib import PurePath
 
+from app.graphmethods import GraphMethods
+from app.fileutils import FileUtils
 
-def mimetype_is_image(path):
-  '''
-  Accepts a path string value
-  '''
-  mime_type = magic.from_file(str(path), mime=True)
-  mime_category = mime_type.split('/')
-  if mime_category[0] == 'image':
-    return True
-  return False
-
-def get_last_modified_datetime(path):
-  '''
-  Accepts a PurePath value
-  '''
-  epoch_time = os.path.getmtime(path)
-  date_time = datetime.utcfromtimestamp(epoch_time)
-  return timezone.make_aware(date_time, timezone=pytz.UTC)
 
 def heavy_get(path):
   '''
@@ -46,24 +31,24 @@ def heavy_get(path):
 
   driver = GraphDatabase.driver("bolt://db:7687", auth=("neo4j", "password"))
 
-  with driver.session() as session:
+  with driver.session() as neo4j_session:
 
-    if path.is_file() and mimetype_is_image(path.app):
+    if path.is_file() and FileUtils().mimetype_is_image(path.app):
 
       md = MetaData(path.app)
-      session.write_transaction(add_image,
+      neo4j_session.write_transaction(GraphMethods().add_image,
         uri=str(path.gallery),
         name=path.name,
         size=md.getImageSize(),
         title=md.getTitle(),
         description=md.getDescription(),
-        last_modified=get_last_modified_datetime(path.app),
+        last_modified=FileUtils().get_last_modified_datetime(path.app),
         parent_uri=str(path.parent)
       )
 
     elif path.is_dir():
 
-      session.write_transaction(add_folder,
+      neo4j_session.write_transaction(GraphMethods().add_folder,
         uri=str(path.gallery),
         name=path.name,
         parent_uri=str(path.parent)
@@ -73,22 +58,38 @@ def heavy_get(path):
 
     return "done"
 
+def collect_existing_resources(path, neo4j_session):
+  # collect current list of child uris
+
+  resources = set()
+
+  for resource in neo4j_session.read_transaction(GraphMethods().get_child_uris,
+    uri=str(path.gallery)
+  ):
+    resources.add(resource["child.uri"])
+
+  resources.discard('.')
+
+  return resources
+
+def exclude_unneeded_resources(existing_resources, parsed_resources):
+  items_to_delete = existing_resources - parsed_resources
+
+  print(items_to_delete)
+  for uri in items_to_delete:
+    neo4j_session.write_transaction(GraphMethods().delete_nodes_and_descendants,
+      uri=uri
+    )
+
 
 def parse_dir(path):
 
   driver = GraphDatabase.driver("bolt://db:7687", auth=("neo4j", "password"))
 
-  with driver.session() as session:
+  with driver.session() as neo4j_session:
 
-    # collect current list of child uris
-    results = session.read_transaction(get_resources,
-      uri=str(path.gallery)
-    )
-
-    resources, resources2 = set(), set()
-    for resource in results:
-      resources.add(resource["child.uri"])
-    resources.discard('.')
+    existing_resources = collect_existing_resources(path, neo4j_session)
+    parsed_resources = set()
 
     # scan the directory specified in the path for all photos
     # and folders, send this info to browser via websockets
@@ -100,76 +101,27 @@ def parse_dir(path):
 
       if not cpath.name.startswith('.') and cpath.is_dir():
 
-        session.write_transaction(add_folder,
+        neo4j_session.write_transaction(GraphMethods().add_folder,
           uri=str(cpath.gallery),
           name=cpath.name,
           parent_uri=str(cpath.parent)
         )
-        resources2.add(str(cpath.gallery))
+        parsed_resources.add(str(cpath.gallery))
 
-      if not cpath.name.startswith('.') and cpath.is_file() and mimetype_is_image(cpath.app):
+      if not cpath.name.startswith('.') and cpath.is_file() and FileUtils().mimetype_is_image(cpath.app):
 
         md = MetaData(cpath.app)
         generate_thumbnails_if_missing(cpath)
 
-        session.write_transaction(add_image,
+        neo4j_session.write_transaction(GraphMethods().add_image,
           uri=str(cpath.gallery),
           name=cpath.name,
           size=md.getImageSize(),
           title=md.getTitle(),
           description=md.getDescription(),
-          last_modified=get_last_modified_datetime(cpath.app),
+          last_modified=FileUtils().get_last_modified_datetime(cpath.app),
           parent_uri=str(cpath.parent)
         )
-        resources2.add(str(cpath.gallery))
+        parsed_resources.add(str(cpath.gallery))
         
-    items_to_delete = resources - resources2
-    # print("resources", resources)
-    # print("resources2", resources2)
-    print(items_to_delete)
-    for uri in items_to_delete:
-      session.write_transaction(delete_nodes_and_descendants,
-        uri=uri
-      )
-
-def delete_nodes_and_descendants(tx, uri):
-  print(" --- deleting node and children ---- ", uri)
-  tx.run(
-    f"""
-      MATCH (node {{ uri: "{uri}" }})
-      MATCH (node)-[:CONTAINS*0..]->(child)
-      DETACH DELETE node, child
-    """
-  )
-
-def get_resources(tx, uri):
-  return tx.run(
-    f"""
-      MATCH (folder:Folder {{ uri: "{uri}" }})-[:CONTAINS]->(child)
-      RETURN child.uri
-    """
-  )
-
-def add_image(tx, uri, name, size, title, description, last_modified, parent_uri):
-  print(" ---- adding image ----- ", uri, name, size, title, description, last_modified, parent_uri)
-  tx.run(
-    f"""
-      MERGE (folder:Folder {{ uri: "{parent_uri}" }})
-      MERGE (folder)-[:CONTAINS]->(image:Image {{  uri: "{uri}" }})
-      SET image.description = "{description}",
-          image.size = "{size}",
-          image.title = "{title}",
-          image.last_modified = "{last_modified}",
-          image.parent_uri = "{parent_uri}"
-    """
-  )
-
-def add_folder(tx, uri, name, parent_uri):
-  print(" ---- adding folder ----- ", uri, name, parent_uri)
-  tx.run(
-    f"""
-      MERGE (folder:Folder {{ uri: "{parent_uri}" }})
-      MERGE (childfolder:Folder {{ uri: "{uri}" }})
-      MERGE (folder)-[:CONTAINS]->(childfolder)
-    """
-  )
+    exclude_unneeded_resources(existing_resources, parsed_resources)
