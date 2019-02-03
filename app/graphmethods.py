@@ -36,20 +36,20 @@ class GraphMethods():
     )
 
   @staticmethod
-  def get_folders(tx, uri):
+  def get_subfolders(tx, uri):
     return tx.run(
       f"""
-        MATCH (folder:Folder {{ uri: "{uri}" }})-[:CONTAINS]->(child:Folder)
-        RETURN child
+        MATCH (folder:Folder {{ uri: "{uri}" }})-[:CONTAINS]->(subfolder:Folder)
+        RETURN subfolder
       """
     )
 
   @staticmethod
-  def get_images(tx, uri):
+  def get_folder_images(tx, uri):
     return tx.run(
       f"""
-        MATCH (folder:Folder {{ uri: "{uri}" }})-[:CONTAINS]->(child:Image)
-        RETURN child
+        MATCH (folder:Folder {{ uri: "{uri}" }})-[:CONTAINS]->(image:Image)
+        RETURN image
       """
     )
 
