@@ -71,13 +71,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "asgiref.inmemory.ChannelLayer",
-#         "ROUTING": "app.routing.channel_routing",
-#     },
-# }
-
 NOTEBOOK_ARGUMENTS = [
     '--ip', '0.0.0.0',
     '--port', '8080',

@@ -21,6 +21,6 @@ from re import escape
 
 urlpatterns = [
     # re_path(r'^' + escape(settings.GALLERY_PREFIX) + '/(?P<path>.*)$', views.get, name='get'),
-    re_path(r'^get/(?P<path>.*)$', views.get, name='get'),
-    re_path(r'^peek/(?P<path>.*)$', views.peek, name='peek'),
+    re_path(r'^api/v1/get/(?P<path>.*)$', views.get, name='get'),
+    re_path(r'^api/v1/peek/(?P<path>.*)$', views.peek, name='peek'),
 ]

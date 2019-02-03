@@ -10,9 +10,17 @@ def get(request, path):
     gallery_path = GalleryPath(path)
     heavy_get(gallery_path)
     data = peek_get(gallery_path)
-    return HttpResponse(json.dumps(data), content_type='application/json')
+
+    return HttpResponse(
+      json.dumps(data),
+      content_type='application/json'
+    )
 
 def peek(request, path):
     gallery_path = GalleryPath(path)
     data = peek_get(gallery_path)
-    return HttpResponse(json.dumps(data), content_type='application/json')
+    
+    return HttpResponse(
+      json.dumps(data),
+      content_type='application/json'
+    )

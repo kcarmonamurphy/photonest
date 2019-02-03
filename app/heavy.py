@@ -12,8 +12,6 @@ from django.conf import settings
 
 from app.thumbnails import generate_thumbnails_if_missing
 
-from neo4j import GraphDatabase
-from neo4j.util import watch
 import logging
 from sys import stdout
 
@@ -29,23 +27,33 @@ def heavy_get(path):
   '''
   print("PARSE_PATH ****", str(path.parent), path.name)
 
-  driver = GraphDatabase.driver("bolt://db:7687", auth=("neo4j", "password"))
+  # get the driver to neo4j database
+  driver = GraphMethods.connect_to_neo4j()
 
   with driver.session() as neo4j_session:
 
+    # check if path points to an image file
     if path.is_file() and FileUtils().mimetype_is_image(path.app):
 
+      # get the metadata for the image
       md = MetaData(path.app)
-      neo4j_session.write_transaction(GraphMethods().add_image,
-        uri=str(path.gallery),
-        name=path.name,
-        size=md.getImageSize(),
-        title=md.getTitle(),
-        description=md.getDescription(),
-        last_modified=FileUtils().get_last_modified_datetime(path.app),
-        parent_uri=str(path.parent)
+
+      params = {
+        'uri': str(path.gallery),
+        'name': path.name,
+        'size': md.getImageSize(),
+        'title': md.getTitle(),
+        'description': md.getDescription(),
+        'last_modified': FileUtils().get_last_modified_datetime(path.app),
+        'parent_uri': str(path.parent)
+      }
+
+      neo4j_session.write_transaction(
+        GraphMethods().add_image,
+        **params
       )
 
+    # check if path points to a directory
     elif path.is_dir():
 
       neo4j_session.write_transaction(GraphMethods().add_folder,
@@ -84,7 +92,7 @@ def exclude_unneeded_resources(existing_resources, parsed_resources):
 
 def parse_dir(path):
 
-  driver = GraphDatabase.driver("bolt://db:7687", auth=("neo4j", "password"))
+  driver = GraphMethods.connect_to_neo4j()
 
   with driver.session() as neo4j_session:
 

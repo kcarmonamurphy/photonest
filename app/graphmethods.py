@@ -1,8 +1,19 @@
+from neo4j import GraphDatabase
+
 class GraphMethods():
   """
   Module containing various methods used to control
   neo4j graph database and written in cipher language
   """
+
+  def connect_to_neo4j():
+    """Gets the connection to the neo4j graph database
+
+    Returns:
+        object: neo4j connection driver
+    """
+    connection = GraphDatabase.driver("bolt://db:7687", auth=("neo4j", "password"))
+    return connection
 
   @staticmethod
   def delete_nodes_and_descendants(tx, uri):
