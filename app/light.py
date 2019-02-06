@@ -2,6 +2,9 @@ from pathlib import PurePath
 
 from neo4j import GraphDatabase
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 from app.fileutils import FileUtils
 from app.path import GalleryPath
 from app.graphmethods import GraphMethods
@@ -18,15 +21,7 @@ def light_get(path):
     object: neo4j connection driver
   """
 
-  print(
-    f"""
-    ==========
-    PARSE_PATH:
-    path.parent: {path.parent}
-    path.name: {path.name}
-    ==========
-    """
-  )
+  logging.info(f" peek {path.parent}/{path.gallery})")
 
   # get the driver to neo4j database
   driver = GraphMethods.connect_to_neo4j()
@@ -74,6 +69,7 @@ def get_folder_contents_from_neo4j(path, neo4j_session):
 
   Parameters:
     path: GalleryPath
+    neo4j_session: neo4j connection
 
   Returns:
     list: individual subfolder and image dicts

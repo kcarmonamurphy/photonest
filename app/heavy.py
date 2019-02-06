@@ -8,6 +8,7 @@ from django.conf import settings
 from app.thumbnails import generate_thumbnails_if_missing
 
 import logging
+logging.basicConfig(level=logging.INFO)
 
 from pathlib import PurePath
 
@@ -23,15 +24,7 @@ def heavy_get(path):
     path: GalleryPath object
   """
 
-  print(
-    f"""
-    ==========
-    PARSE_PATH:
-    path.parent: {path.parent}
-    path.name: {path.name}
-    ==========
-    """
-  )
+  logging.info(f" get {path.parent}/{path.gallery})")
 
   # get the driver to neo4j database
   driver = GraphMethods.connect_to_neo4j()
