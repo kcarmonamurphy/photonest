@@ -22,10 +22,23 @@ from app.fileutils import FileUtils
 
 
 def heavy_get(path):
-  '''
-  Accepts a GalleryPath value
-  '''
-  print("PARSE_PATH ****", str(path.parent), path.name)
+  """
+  Heavyweight GET for any GalleryPath object which parses metadata
+  of either single image element or all subfolder contents
+
+  Parameters:
+    path: GalleryPath object
+  """
+
+  print(
+    f"""
+    ==========
+    PARSE_PATH:
+    path.parent: {path.parent}
+    path.name: {path.name}
+    ==========
+    """
+  )
 
   # get the driver to neo4j database
   driver = GraphMethods.connect_to_neo4j()
@@ -56,10 +69,15 @@ def heavy_get(path):
     # check if path points to a directory
     elif path.is_dir():
 
-      neo4j_session.write_transaction(GraphMethods().add_folder,
-        uri=str(path.gallery),
-        name=path.name,
-        parent_uri=str(path.parent)
+      params = {
+        'uri': str(path.gallery),
+        'name': path.name,
+        'parent_uri': str(path.parent)
+      }
+
+      neo4j_session.write_transaction(
+        GraphMethods().add_folder,
+        **params
       )
 
       parse_dir(path)
@@ -71,8 +89,13 @@ def collect_existing_resources(path, neo4j_session):
 
   resources = set()
 
-  for resource in neo4j_session.read_transaction(GraphMethods().get_child_uris,
-    uri=str(path.gallery)
+  params = {
+    'uri': str(path.gallery)
+  }
+
+  for resource in neo4j_session.read_transaction(
+    GraphMethods().get_child_uris,
+    **params
   ):
     resources.add(resource["child.uri"])
 
@@ -84,11 +107,16 @@ def exclude_unneeded_resources(existing_resources, parsed_resources):
   items_to_delete = existing_resources - parsed_resources
 
   print(items_to_delete)
-  for uri in items_to_delete:
-    neo4j_session.write_transaction(GraphMethods().delete_nodes_and_descendants,
-      uri=uri
-    )
 
+  for uri in items_to_delete:
+    params = {
+      'uri': uri
+    }
+
+    neo4j_session.write_transaction(
+      GraphMethods().delete_nodes_and_descendants,
+      **params
+    )
 
 def parse_dir(path):
 
@@ -109,11 +137,17 @@ def parse_dir(path):
 
       if not cpath.name.startswith('.') and cpath.is_dir():
 
-        neo4j_session.write_transaction(GraphMethods().add_folder,
-          uri=str(cpath.gallery),
-          name=cpath.name,
-          parent_uri=str(cpath.parent)
+        params = {
+          'uri': str(cpath.gallery),
+          'name': cpath.name,
+          'parent_uri': str(cpath.parent)
+        }
+
+        neo4j_session.write_transaction(
+          GraphMethods().add_folder,
+          **params
         )
+
         parsed_resources.add(str(cpath.gallery))
 
       if not cpath.name.startswith('.') and cpath.is_file() and FileUtils().mimetype_is_image(cpath.app):
@@ -121,15 +155,21 @@ def parse_dir(path):
         md = MetaData(cpath.app)
         generate_thumbnails_if_missing(cpath)
 
-        neo4j_session.write_transaction(GraphMethods().add_image,
-          uri=str(cpath.gallery),
-          name=cpath.name,
-          size=md.getImageSize(),
-          title=md.getTitle(),
-          description=md.getDescription(),
-          last_modified=FileUtils().get_last_modified_datetime(cpath.app),
-          parent_uri=str(cpath.parent)
+        params = {
+          'uri': str(cpath.gallery),
+          'name': cpath.name,
+          'size': md.getImageSize(),
+          'title': md.getTitle(),
+          'description': md.getDescription(),
+          'last_modified': FileUtils().get_last_modified_datetime(cpath.app),
+          'parent_uri': str(cpath.parent)
+        }
+
+        neo4j_session.write_transaction(
+          GraphMethods().add_image,
+          **params
         )
+        
         parsed_resources.add(str(cpath.gallery))
         
     exclude_unneeded_resources(existing_resources, parsed_resources)

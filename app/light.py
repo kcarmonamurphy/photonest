@@ -6,6 +6,43 @@ from app.fileutils import FileUtils
 from app.path import GalleryPath
 from app.graphmethods import GraphMethods
 
+def light_get(path):
+  """
+  Lightweight GET for any GalleryPath which provides the cached contents
+  of that path from the neo4j graph database
+
+  Parameters:
+    path: GalleryPath object
+
+  Returns:
+    object: neo4j connection driver
+  """
+
+  print(
+    f"""
+    ==========
+    PARSE_PATH:
+    path.parent: {path.parent}
+    path.name: {path.name}
+    ==========
+    """
+  )
+
+  # get the driver to neo4j database
+  driver = GraphMethods.connect_to_neo4j()
+
+  # open up a session to the neo4j database
+  with driver.session() as neo4j_session:
+
+    # if image, return image from neo4j as a dict
+    if path.is_file() and FileUtils().mimetype_is_image(path.app):
+      return get_single_image_from_neo4j(path, neo4j_session)
+
+    # if folder, return folder contents (subfolders and images) as a list
+    elif path.is_dir():
+      return get_folder_contents_from_neo4j(path, neo4j_session)
+
+
 def get_single_image_from_neo4j(path, neo4j_session):
   """
   Return image details, given path
@@ -109,39 +146,3 @@ def build_image_response(image):
     'uri': image['uri'],
     'type': 'image'
   }
-
-def peek_get(path):
-  """
-  Lightweight GET for any GalleryPath which provides the cached contents
-  of that path from the neo4j graph database
-
-  Parameters:
-    path: GalleryPath object
-
-  Returns:
-    object: neo4j connection driver
-  """
-
-  print(
-    f"""
-    ==========
-    PARSE_PATH:
-    path.parent: {path.parent}
-    path.name: {path.name}
-    ==========
-    """
-  )
-
-  # get the driver to neo4j database
-  driver = GraphMethods.connect_to_neo4j()
-
-  # open up a session to the neo4j database
-  with driver.session() as neo4j_session:
-
-    # if image, return image from neo4j as a dict
-    if path.is_file() and FileUtils().mimetype_is_image(path.app):
-      return get_single_image_from_neo4j(path, neo4j_session)
-
-    # if folder, return folder contents (subfolders and images) as a list
-    elif path.is_dir():
-      return get_folder_contents_from_neo4j(path, neo4j_session)
