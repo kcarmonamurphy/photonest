@@ -149,8 +149,3 @@ class MetaData():
 
         except:
             return False
-
-
-
-
-

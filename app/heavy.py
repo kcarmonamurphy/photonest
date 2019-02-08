@@ -48,7 +48,7 @@ def heavy_get(path):
       parsed_resources = write_folder_contents_to_neo4j(path, neo4j_session)
 
       # perform set difference and delete irrelevant nodes
-      exclude_unneeded_resources(existing_resources, parsed_resources)
+      exclude_unneeded_resources(existing_resources, parsed_resources, neo4j_session)
 
     return "done"
 
@@ -156,7 +156,7 @@ def collect_existing_resources(path, neo4j_session):
 
   return resources
 
-def exclude_unneeded_resources(existing_resources, parsed_resources):
+def exclude_unneeded_resources(existing_resources, parsed_resources, neo4j_session):
   """
   Iterate through the contents of the folder and add them to the
   neo4j database. Also, return a set of all resources added so that

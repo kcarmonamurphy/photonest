@@ -3,14 +3,16 @@ from subprocess import check_output
 
 def generate_thumbnails_if_missing(path):
 
-    if not path.thumbnail_dir.is_dir():
-        os.mkdir(path.thumbnail_dir)
+  # if there is no thumbnail dir for folder, create one
+  if not path.thumbnail_dir.is_dir():
+      os.mkdir(path.thumbnail_dir)
 
-    if not path.thumbnail('small').is_file():
-        try:
-            check_output(["convert", path.app, "-strip", "-resize", "256x256", path.thumbnail('small')])
-        except:
-            print("Error generating 256x256 thumbnail")
+  # create small thumbnail image
+  if not path.thumbnail('small').is_file():
+      try:
+          check_output(["convert", path.app, "-strip", "-resize", "256x256", path.thumbnail('small')])
+      except:
+          print("Error generating 256x256 thumbnail")
 
     # if not os.path.isfile(path.thumbnail.medium):
     #     try:

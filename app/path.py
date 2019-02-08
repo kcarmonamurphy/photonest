@@ -1,7 +1,5 @@
 """
-# path.app: path relative to the application
-# - /app/gallery/album/photo.jpg
-# - /app/gallery/album/                          
+                     
 
 # path.gallery: passed into the view functions, path relative to gallery folder
 # - album/photo.jpg                                
@@ -29,37 +27,58 @@ class GalleryPath():
     used by the various functions in the app
     """
 
-    '''
-    Initialization of Class
-    -----------------------
-    '''
-
     def __init__(self, path):
+        """
+        Constructor method for class. Rules for creating a GalleryPath
+        object are that it must be a relative path off the GALLERY_BASE_DIR,
+        it must exist and must not point to a file up the directory tree
+
+        Parameters:
+            path: a string
+        """
 
         if ".." in str(path):
             raise Exception('cannot traverse backwards')
 
+        # `_path` variable represents /api/v1/get/{path}
+        # PurePath does not check if path exists in file system
         self._path = PurePath(path)
 
         if self._path.is_absolute():
             raise Exception('absolute paths not allowed')
 
+        # `_app_path` represents full path from app root
+        # if `_path` is "desk", `_app_path` is "/app/gallery/desk"
+        # ConcretePath does not check if path exists in file system
         self._app_path = ConcretePath(settings.GALLERY_BASE_DIR).joinpath(path)
 
         if not self._app_path.exists():
             raise Exception('path does not exist')
 
-    '''
-    Public Methods
-    ----------------
-    '''
-
     @property
     def app(self):
+        """
+        Returns a PosixPath or WindowsPath path relative to the application root.
+        
+        Examples:
+
+        GalleryPath('desk') -> PosixPath('/app/gallery/desk')
+        GalleryPath('') -> PosixPath('/app/gallery/')
+        GalleryPath('../') -> Exception('cannot traverse backwards')
+        """
         return self._app_path
 
     @property
     def gallery(self):
+        """
+        Returns a PosixPath or WindowsPath path relative to the application root.
+        
+        Examples:
+
+        GalleryPath('desk') -> PosixPath('/app/gallery/desk')
+        GalleryPath('') -> .
+        GalleryPath('') -> Exception('cannot traverse backwards')
+        """
         return self._path
 
     @property
