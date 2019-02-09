@@ -1,14 +1,3 @@
-"""
-# path.relative_path: passed into the view functions, path relative to gallery folder
-# - album/photo.jpg                                
-# - album/                                                
-
-# path.thumbnail(): for finding the thumbnail
-# - /app/gallery/album/.photonest/photo.jpg_thumbnail_256  
-# - /app/gallery/album/.photonest/photo.jpg_thumbnail_512      
-# - /app/gallery/album/.photonest/                        
-"""
-
 from django.conf import settings
 from django.http import Http404
 import os
@@ -53,12 +42,12 @@ class GalleryPath():
     @property
     def relative_path(self):
         """
-        Returns a PurePosixPath or PureWindowsPath path relative to the application root.
-        
+        Returns a path string relative to the gallery URL
+
         Examples:
 
-        GalleryPath('desk') -> PurePosixPath('desk')
-        GalleryPath('') -> PurePosixPath('.')
+        GalleryPath('desk') -> 'desk'
+        GalleryPath('') -> '.'
         GalleryPath('../') -> Exception('cannot traverse backwards')
         """
         return str(self._path)
@@ -79,21 +68,33 @@ class GalleryPath():
     @property
     def parent_relative(self):
         """
-        Returns the parent path relative to gallery URL
+        Returns the parent path as a string relative to gallery URL
         
         Examples:
 
-        GalleryPath('models/1.jpg') -> PurePosixPath('models')
-        GalleryPath('1.jpg') -> PurePosixPath('.')
-        GalleryPath('.') -> PurePosixPath('.')
+        GalleryPath('models/1.jpg') -> 'models'
+        GalleryPath('1.jpg') -> '.'
+        GalleryPath('.') -> '.'
         GalleryPath('../') -> Exception('cannot traverse backwards')
         """
         return str(self._path.parent)
 
     def is_file(self):
+        """
+        Does the path point to a file?
+        
+        Returns:
+          Boolean
+        """
         return self.app.is_file()
 
     def is_dir(self):
+        """
+        Does the path point to a directory?
+        
+        Returns:
+          Boolean
+        """
         return self.app.is_dir()
 
     @property
@@ -111,10 +112,26 @@ class GalleryPath():
 
     @property
     def thumbnail_dir(self):
+        """
+        Return the absolute path to a thumbnail fplder
+
+        Examples:
+        
+        /app/gallery/album/.photonest/
+        """
         return self.app.parent.joinpath(
             settings.THUMBNAILS_FOLDER)
 
     def thumbnail(self, size="small"):
+        """
+        Return the absolute path to a thumbnail file
+
+        Examples:
+
+        /app/gallery/album/.photonest/photo.jpg_thumbnail_256  
+        /app/gallery/album/.photonest/photo.jpg_thumbnail_512
+        """
+
         if not self.is_file():
             raise Exception('can\'t get thumbnail of folder')
 
