@@ -56,6 +56,52 @@ class GalleryPath():
             raise Exception('path does not exist')
 
     @property
+    def gallery(self):
+        """
+        Returns a PurePosixPath or PureWindowsPath path relative to the application root.
+        
+        Examples:
+
+        GalleryPath('desk') -> PurePosixPath('desk')
+        GalleryPath('') -> PurePosixPath('.')
+        GalleryPath('../') -> Exception('cannot traverse backwards')
+        """
+        return str(self._path)
+
+    @property
+    def resource_name(self):
+        """
+        Returns the resource name as a string
+        
+        Examples:
+
+        GalleryPath('desk') -> 'desk'
+        GalleryPath('') -> ''
+        GalleryPath('../') -> Exception('cannot traverse backwards')
+        """
+        return self._path.name
+
+    @property
+    def parent(self):
+        """
+        Returns the parent path relative to gallery URL
+        
+        Examples:
+
+        GalleryPath('models/1.jpg') -> PurePosixPath('models')
+        GalleryPath('1.jpg') -> PurePosixPath('.')
+        GalleryPath('.') -> PurePosixPath('.')
+        GalleryPath('../') -> Exception('cannot traverse backwards')
+        """
+        return self._path.parent
+
+    def is_file(self):
+        return self.app.is_file()
+
+    def is_dir(self):
+        return self.app.is_dir()
+
+    @property
     def app(self):
         """
         Returns a PosixPath or WindowsPath path relative to the application root.
@@ -69,47 +115,16 @@ class GalleryPath():
         return self._app_path
 
     @property
-    def gallery(self):
-        """
-        Returns a PosixPath or WindowsPath path relative to the application root.
-        
-        Examples:
-
-        GalleryPath('desk') -> PosixPath('/app/gallery/desk')
-        GalleryPath('') -> .
-        GalleryPath('') -> Exception('cannot traverse backwards')
-        """
-        return self._path
-
-    @property
-    def name(self):
-        return self.gallery.name
-
-    @property
-    def parent(self):
-        return self.gallery.parent
-
-    @property
-    def app_parent(self):
-        return self.app.parent
-
-    def is_file(self):
-        return self.app.is_file()
-
-    def is_dir(self):
-        return self.app.is_dir()
-
-    @property
     def thumbnail_dir(self):
-        return self.app_parent.joinpath(
+        return self.app.parent.joinpath(
             settings.THUMBNAILS_FOLDER)
 
     def thumbnail(self, size="small"):
         if not self.is_file():
             raise Exception('can\'t get thumbnail of folder')
 
-        thumbnail_filename = self.name + settings.THUMBNAIL_PREFIX + str(settings.THUMBNAIL_SIZES[size])
+        thumbnail_filename = self.resource_name + settings.THUMBNAIL_PREFIX + str(settings.THUMBNAIL_SIZES[size])
         
-        return self.app_parent.joinpath(
+        return self.app.parent.joinpath(
             settings.THUMBNAILS_FOLDER, thumbnail_filename)   
  

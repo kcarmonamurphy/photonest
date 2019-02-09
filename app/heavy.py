@@ -84,8 +84,8 @@ def build_image_params(path, md):
   """
 
   return {
-    'uri': str(path.gallery),
-    'name': path.name,
+    'uri': path.gallery,
+    'resource_name': path.resource_name,
     'size': md.getImageSize(),
     'title': md.getTitle(),
     'description': md.getDescription(),
@@ -121,8 +121,8 @@ def build_folder_params(path):
   """
 
   return {
-    'uri': str(path.gallery),
-    'name': path.name,
+    'uri': path.gallery,
+    'resource_name': path.resource_name,
     'parent_uri': str(path.parent)
   }
 
@@ -143,7 +143,7 @@ def collect_existing_resources(path, neo4j_session):
   resources = set()
 
   params = {
-    'uri': str(path.gallery)
+    'uri': path.gallery
   }
 
   for resource in neo4j_session.read_transaction(
@@ -206,18 +206,18 @@ def write_folder_contents_to_neo4j(path, neo4j_session):
       PurePath(child.path).relative_to(settings.GALLERY_BASE_DIR)
     )
 
-    if not child_path.name.startswith('.') and child_path.is_dir():
+    if not child_path.resource_name.startswith('.') and child_path.is_dir():
       # write the subfolder to neo4j
       write_single_folder_to_neo4j(child_path, neo4j_session)
       # add uri to set
-      contents_set.add(str(child_path.gallery))
+      contents_set.add(child_path.gallery)
 
-    if not child_path.name.startswith('.') and child_path.is_file() and FileUtils().mimetype_is_image(child_path.app):
+    if not child_path.resource_name.startswith('.') and child_path.is_file() and FileUtils().mimetype_is_image(child_path.app):
       # write the image to neo4j
       write_single_image_to_neo4j(child_path, neo4j_session)
       # if image thumbnails are missing, create them
       generate_thumbnails_if_missing(child_path)
       # add uri to set
-      contents_set.add(str(child_path.gallery))
+      contents_set.add(child_path.gallery)
 
   return contents_set

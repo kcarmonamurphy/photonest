@@ -50,7 +50,7 @@ def get_single_image_from_neo4j(path, neo4j_session):
   """
 
   params = {
-    'uri': str(path.gallery)
+    'uri': path.gallery
   }
 
   # even though we're getting a single image, we must still use a for loop
@@ -80,7 +80,7 @@ def get_folder_contents_from_neo4j(path, neo4j_session):
 
   # set the parameters to be passed to neo4j methods
   params = {
-    'uri': str(path.gallery)
+    'uri': path.gallery
   }
 
   # get all of the subfolders of 'path' and add them to the
@@ -119,6 +119,7 @@ def build_subfolder_response(subfolder):
   return {
     'parent_uri': subfolder['parent_uri'],
     'uri': subfolder['uri'],
+    'resource_name': subfolder['resource_name'],
     'type': 'folder'
   }
 
@@ -136,6 +137,7 @@ def build_image_response(image):
   return {
     'parent_uri': image['parent_uri'],
     'description': image['description'],
+    'resource_name': image['resource_name'],
     'size': image['size'],
     'title': image['title'],
     'last_modified': image['last_modified'],
