@@ -1,9 +1,9 @@
-FROM python:3.7
+FROM python:3.7.2
 
 ENV PYTHONUNBUFFERED 1
 
-ENV EXIFTOOL_VERSION=11.10
-ENV IMAGEMAGICK_VERSION=7.0.8-11
+ENV EXIFTOOL_VERSION=11.26
+ENV IMAGEMAGICK_VERSION=7.0.8-26
 
 RUN apt-get update
 RUN apt-get upgrade -y
@@ -19,7 +19,6 @@ RUN cd /tmp \
 	&& rm -rf Image-ExifTool-${EXIFTOOL_VERSION}
 
 RUN apt-get install imagemagick -y
-RUN apt-get install supervisor -y
 
 RUN mkdir /app
 

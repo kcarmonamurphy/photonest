@@ -1,7 +1,4 @@
-collection/*
 .env
-*.ipynb
-.ipynb_checkpoints/*
 gallery/*
 node_modules/*
 logs/*

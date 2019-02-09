@@ -1,7 +1,4 @@
-Django
-django-dotenv
-django-extensions
-jupyter
-python-magic
-channels
-neo4j
+Django==2.1.5
+django-dotenv==1.4.2
+python-magic==0.4.15
+neo4j==1.7.1

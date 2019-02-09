@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 services:
   db:
@@ -6,7 +6,6 @@ services:
     volumes:
       - db_data:$HOME/neo4j/data
       - logs:$HOME/neo4j/logs
-      - ./neo4jplugins:/plugins
     environment:
       NEO4J_AUTH: "neo4j/password"
     ports:
@@ -15,11 +14,10 @@ services:
     restart: always
   web:
     build: .
-    command: /usr/bin/supervisord -c supervisord.conf
+    command: python manage.py runserver 0.0.0.0:4567
     volumes:
       - .:/app
     ports:
-      - "8080:8080"
       - "4567:4567"
     depends_on:
       - db

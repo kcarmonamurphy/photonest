@@ -86,6 +86,7 @@ class GraphMethods():
         MERGE (folder:Folder {{ uri: "{parent_uri}" }})
         MERGE (childfolder:Folder {{ uri: "{uri}" }})
         MERGE (folder)-[:CONTAINS]->(childfolder)
-        SET childfolder.resource_name = "{resource_name}"
+        SET childfolder.resource_name = "{resource_name}",
+            childfolder.parent_uri = "{parent_uri}"
       """
     )

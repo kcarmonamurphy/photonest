@@ -1,7 +1,5 @@
 """
-                     
-
-# path.gallery: passed into the view functions, path relative to gallery folder
+# path.relative_path: passed into the view functions, path relative to gallery folder
 # - album/photo.jpg                                
 # - album/                                                
 
@@ -9,9 +7,6 @@
 # - /app/gallery/album/.photonest/photo.jpg_thumbnail_256  
 # - /app/gallery/album/.photonest/photo.jpg_thumbnail_512      
 # - /app/gallery/album/.photonest/                        
-
-# uri: web resource to load mime type image
-# - http://domain.com/gallery/album/photo.jpg?raw=1
 """
 
 from django.conf import settings
@@ -56,7 +51,7 @@ class GalleryPath():
             raise Exception('path does not exist')
 
     @property
-    def gallery(self):
+    def relative_path(self):
         """
         Returns a PurePosixPath or PureWindowsPath path relative to the application root.
         
@@ -82,7 +77,7 @@ class GalleryPath():
         return self._path.name
 
     @property
-    def parent(self):
+    def parent_relative(self):
         """
         Returns the parent path relative to gallery URL
         
@@ -93,7 +88,7 @@ class GalleryPath():
         GalleryPath('.') -> PurePosixPath('.')
         GalleryPath('../') -> Exception('cannot traverse backwards')
         """
-        return self._path.parent
+        return str(self._path.parent)
 
     def is_file(self):
         return self.app.is_file()

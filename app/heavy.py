@@ -24,7 +24,7 @@ def heavy_get(path):
     path: GalleryPath object
   """
 
-  logging.info(f" get {path.parent}/{path.gallery})")
+  logging.info(f" get {path.parent_relative}/{path.relative_path})")
 
   # get the driver to neo4j database
   driver = GraphMethods.connect_to_neo4j()
@@ -84,13 +84,13 @@ def build_image_params(path, md):
   """
 
   return {
-    'uri': path.gallery,
+    'uri': path.relative_path,
     'resource_name': path.resource_name,
     'size': md.getImageSize(),
     'title': md.getTitle(),
     'description': md.getDescription(),
     'last_modified': FileUtils().get_last_modified_datetime(path.app),
-    'parent_uri': str(path.parent)
+    'parent_uri': path.parent_relative
   }
 
 def write_single_folder_to_neo4j(path, neo4j_session):
@@ -121,9 +121,9 @@ def build_folder_params(path):
   """
 
   return {
-    'uri': path.gallery,
+    'uri': path.relative_path,
     'resource_name': path.resource_name,
-    'parent_uri': str(path.parent)
+    'parent_uri': path.parent_relative
   }
 
 def collect_existing_resources(path, neo4j_session):
@@ -143,7 +143,7 @@ def collect_existing_resources(path, neo4j_session):
   resources = set()
 
   params = {
-    'uri': path.gallery
+    'uri': path.relative_path
   }
 
   for resource in neo4j_session.read_transaction(
@@ -210,7 +210,7 @@ def write_folder_contents_to_neo4j(path, neo4j_session):
       # write the subfolder to neo4j
       write_single_folder_to_neo4j(child_path, neo4j_session)
       # add uri to set
-      contents_set.add(child_path.gallery)
+      contents_set.add(child_path.relative_path)
 
     if not child_path.resource_name.startswith('.') and child_path.is_file() and FileUtils().mimetype_is_image(child_path.app):
       # write the image to neo4j
@@ -218,6 +218,6 @@ def write_folder_contents_to_neo4j(path, neo4j_session):
       # if image thumbnails are missing, create them
       generate_thumbnails_if_missing(child_path)
       # add uri to set
-      contents_set.add(child_path.gallery)
+      contents_set.add(child_path.relative_path)
 
   return contents_set

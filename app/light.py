@@ -21,7 +21,7 @@ def light_get(path):
     object: neo4j connection driver
   """
 
-  logging.info(f" peek {path.parent}/{path.gallery})")
+  logging.info(f" peek {path.parent_relative}/{path.relative_path})")
 
   # get the driver to neo4j database
   driver = GraphMethods.connect_to_neo4j()
@@ -50,7 +50,7 @@ def get_single_image_from_neo4j(path, neo4j_session):
   """
 
   params = {
-    'uri': path.gallery
+    'uri': path.relative_path
   }
 
   # even though we're getting a single image, we must still use a for loop
@@ -80,7 +80,7 @@ def get_folder_contents_from_neo4j(path, neo4j_session):
 
   # set the parameters to be passed to neo4j methods
   params = {
-    'uri': path.gallery
+    'uri': path.relative_path
   }
 
   # get all of the subfolders of 'path' and add them to the
