@@ -142,5 +142,7 @@ def build_image_response(image):
     'title': image['title'],
     'last_modified': image['last_modified'],
     'uri': image['uri'],
+    'thumbnail_uri': image['thumbnail_uri'],
+    'full_image_uri': image['full_image_uri'],
     'type': 'image'
   }

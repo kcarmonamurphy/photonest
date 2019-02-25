@@ -63,8 +63,8 @@ class GraphMethods():
     )
 
   @staticmethod
-  def add_image(tx, uri, resource_name, size, title, description, last_modified, parent_uri):
-    print(" ---- adding image ----- ", uri, resource_name, size, title, description, last_modified, parent_uri)
+  def add_image(tx, uri, resource_name, size, title, description, last_modified, parent_uri, thumbnail_uri, full_image_uri):
+    print(" ---- adding image ----- ", uri, resource_name, size, title, description, last_modified, parent_uri, thumbnail_uri, full_image_uri)
     tx.run(
       f"""
         MERGE (folder:Folder {{ uri: "{parent_uri}" }})
@@ -74,7 +74,9 @@ class GraphMethods():
             image.title = "{title}",
             image.resource_name = "{resource_name}",
             image.last_modified = "{last_modified}",
-            image.parent_uri = "{parent_uri}"
+            image.parent_uri = "{parent_uri}",
+            image.thumbnail_uri = "{thumbnail_uri}",
+            image.full_image_uri = "{full_image_uri}"
       """
     )
 

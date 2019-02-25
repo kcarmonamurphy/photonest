@@ -15,6 +15,10 @@ from pathlib import PurePath
 from app.graphmethods import GraphMethods
 from app.fileutils import FileUtils
 
+def fquri(uri):
+  host = 'http://localhost:4567'
+  return host + uri
+
 def heavy_get(path):
   """
   Heavyweight GET for any GalleryPath object which parses metadata
@@ -90,7 +94,10 @@ def build_image_params(path, md):
     'title': md.getTitle(),
     'description': md.getDescription(),
     'last_modified': FileUtils().get_last_modified_datetime(path.app),
-    'parent_uri': path.parent_relative
+    'parent_uri': path.parent_relative,
+    'thumbnail_uri': fquri('/api/v1/thumbnail/' + path.relative_path),
+    'full_image_uri': fquri('/api/v1/full/' + path.relative_path)
+
   }
 
 def write_single_folder_to_neo4j(path, neo4j_session):

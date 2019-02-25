@@ -113,7 +113,7 @@ class GalleryPath():
     @property
     def thumbnail_dir(self):
         """
-        Return the absolute path to a thumbnail fplder
+        Return the absolute path to a thumbnail folder
 
         Examples:
         
@@ -136,7 +136,8 @@ class GalleryPath():
             raise Exception('can\'t get thumbnail of folder')
 
         thumbnail_filename = self.resource_name + settings.THUMBNAIL_PREFIX + str(settings.THUMBNAIL_SIZES[size])
-        
+
         return self.app.parent.joinpath(
-            settings.THUMBNAILS_FOLDER, thumbnail_filename)   
+            settings.THUMBNAILS_FOLDER, thumbnail_filename)
+
  
